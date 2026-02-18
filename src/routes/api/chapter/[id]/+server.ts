@@ -36,16 +36,16 @@ export const PATCH: RequestHandler = async (event) => {
 	const chapterNumber = Number(body?.chapterNumber ?? 1);
 	const status = String(body?.status ?? 'draft').trim() || 'draft';
 
-	if (Number.isNaN(projectId)) {
-		return json({ error: 'Project is required.' }, { status: 400 });
+	if (!Number.isInteger(projectId) || projectId < 1) {
+		return json({ error: 'Project id must be a positive integer.' }, { status: 400 });
 	}
 
 	if (!title) {
 		return json({ error: 'Chapter title is required.' }, { status: 400 });
 	}
 
-	if (Number.isNaN(chapterNumber) || chapterNumber < 1) {
-		return json({ error: 'Chapter number must be greater than 0.' }, { status: 400 });
+	if (!Number.isInteger(chapterNumber) || chapterNumber < 1) {
+		return json({ error: 'Chapter number must be a positive integer.' }, { status: 400 });
 	}
 
 	const selectedProject = await db.query.project.findFirst({

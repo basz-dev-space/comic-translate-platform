@@ -41,8 +41,12 @@ export const actions: Actions = {
 		const chapterNumber = Number(formData.get('chapterNumber') ?? 1);
 		const status = String(formData.get('status') ?? 'draft').trim() || 'draft';
 
-		if (Number.isNaN(projectId)) {
-			throw error(400, 'Project is required.');
+		if (!Number.isInteger(projectId) || projectId < 1) {
+			throw error(400, 'Project id must be a positive integer.');
+		}
+
+		if (!Number.isInteger(chapterNumber) || chapterNumber < 1) {
+			throw error(400, 'Chapter number must be a positive integer.');
 		}
 
 		const selectedProject = await db.query.project.findFirst({

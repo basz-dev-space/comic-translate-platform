@@ -32,5 +32,8 @@ export const accountProfile = pgTable('account_profile', {
 	id: serial('id').primaryKey(),
 	userId: text('user_id').notNull().unique(),
 	displayName: text('display_name'),
-	updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
+	updatedAt: timestamp('updated_at', { withTimezone: true })
+		.notNull()
+		.defaultNow()
+		.$onUpdate(() => new Date())
 });
