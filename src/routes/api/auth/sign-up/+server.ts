@@ -1,9 +1,9 @@
 import { json, type RequestHandler } from '@sveltejs/kit';
 import { stack } from '$lib/server/stack';
-import { setSessionCookies, getAppOrigin } from '$lib/server/auth';
+import { setSessionCookies, getOrigin } from '$lib/server/auth';
 import { signUpSchema } from '$lib/schemas/auth';
 
-export const POST: RequestHandler = async ({ request, cookies }) => {
+export const POST: RequestHandler = async ({ request, cookies, url }) => {
 	try {
 		let body: Record<string, unknown>;
 		try {
@@ -26,7 +26,7 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 
 		const { email, password } = parseResult.data;
 
-		const origin = getAppOrigin();
+		const origin = getOrigin(url);
 		const verificationCallbackUrl = `${origin}/auth/verify-email`;
 
 		const result = await stack.signUp(email, password, verificationCallbackUrl);

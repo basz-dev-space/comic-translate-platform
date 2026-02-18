@@ -4,7 +4,7 @@ import {
 	getOAuthStateCookie,
 	clearOAuthStateCookie,
 	setSessionCookies,
-	getAppOrigin
+	getOrigin
 } from '$lib/server/auth';
 
 export const GET: RequestHandler = async ({ url, cookies }) => {
@@ -31,7 +31,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 
 		clearOAuthStateCookie(cookies);
 
-		const origin = getAppOrigin();
+		const origin = getOrigin(url);
 		const redirectUri = `${origin}/api/auth/oauth/callback`;
 
 		const result = await stack.exchangeOAuthCode(code, redirectUri);

@@ -14,15 +14,12 @@ const COOKIE_OPTIONS = {
 	sameSite: 'lax' as const
 };
 
-export function getAppOrigin(): string {
-	const origin = env.ORIGIN;
-	if (!origin) {
-		if (dev) {
-			return 'http://localhost:5173';
-		}
-		throw new Error('ORIGIN environment variable is required in production');
+export function getOrigin(url: URL): string {
+	const envOrigin = env.ORIGIN;
+	if (envOrigin) {
+		return envOrigin;
 	}
-	return origin;
+	return url.origin;
 }
 
 export function setSessionCookies(cookies: Cookies, session: AuthSession): void {

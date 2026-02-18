@@ -1,8 +1,8 @@
 import { redirect, type RequestHandler } from '@sveltejs/kit';
 import { stack } from '$lib/server/stack';
-import { setOAuthStateCookie, generateOAuthState, getAppOrigin } from '$lib/server/auth';
+import { setOAuthStateCookie, generateOAuthState, getOrigin } from '$lib/server/auth';
 
-export const GET: RequestHandler = async ({ params, cookies }) => {
+export const GET: RequestHandler = async ({ params, cookies, url }) => {
 	const providerId = params.provider;
 
 	if (!providerId) {
@@ -11,7 +11,7 @@ export const GET: RequestHandler = async ({ params, cookies }) => {
 
 	const state = generateOAuthState();
 
-	const origin = getAppOrigin();
+	const origin = getOrigin(url);
 	const redirectUri = `${origin}/api/auth/oauth/callback`;
 
 	setOAuthStateCookie(cookies, state);
