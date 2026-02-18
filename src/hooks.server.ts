@@ -1,10 +1,10 @@
 import type { Handle } from '@sveltejs/kit';
 import { sequence } from '@sveltejs/kit/hooks';
-import { authenticateRequest } from '$lib/server/auth';
+import { sessionHooks, type EventHandler } from '@kinde-oss/kinde-auth-sveltekit';
 import { paraglideMiddleware } from '$lib/paraglide/server';
 
-const handleAuth: Handle = async ({ event, resolve }) => {
-	event.locals.user = await authenticateRequest(event.cookies);
+const handleKinde: Handle = async ({ event, resolve }) => {
+	await sessionHooks({ event: event as EventHandler });
 	return resolve(event);
 };
 
@@ -17,4 +17,4 @@ const handleParaglide: Handle = ({ event, resolve }) =>
 		});
 	});
 
-export const handle: Handle = sequence(handleAuth, handleParaglide);
+export const handle: Handle = sequence(handleKinde, handleParaglide);

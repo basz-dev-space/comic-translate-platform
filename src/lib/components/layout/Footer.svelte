@@ -40,23 +40,43 @@
 				<h4 class="font-display text-sm tracking-wide uppercase">Product</h4>
 				<ul class="mt-4 space-y-2 font-body text-sm">
 					<li>
-						<a href="#features" class="text-muted-foreground hover:text-foreground">Features</a>
+						<a href="/#features" class="text-muted-foreground hover:text-foreground">Features</a>
 					</li>
 					<li>
-						<a href="#pricing" class="text-muted-foreground hover:text-foreground">Pricing</a>
+						<a href="/#pricing" class="text-muted-foreground hover:text-foreground">Pricing</a>
 					</li>
-					<li><a href="#" class="text-muted-foreground hover:text-foreground">Roadmap</a></li>
-					<li><a href="#" class="text-muted-foreground hover:text-foreground">Changelog</a></li>
+					<li>
+						<button type="button" class="text-muted-foreground hover:text-foreground"
+							>Roadmap</button
+						>
+					</li>
+					<li>
+						<button type="button" class="text-muted-foreground hover:text-foreground"
+							>Changelog</button
+						>
+					</li>
 				</ul>
 			</div>
 
 			<div>
 				<h4 class="font-display text-sm tracking-wide uppercase">Company</h4>
 				<ul class="mt-4 space-y-2 font-body text-sm">
-					<li><a href="#" class="text-muted-foreground hover:text-foreground">About</a></li>
-					<li><a href="#" class="text-muted-foreground hover:text-foreground">Blog</a></li>
-					<li><a href="#" class="text-muted-foreground hover:text-foreground">Contact</a></li>
-					<li><a href="#" class="text-muted-foreground hover:text-foreground">Privacy</a></li>
+					<li>
+						<button type="button" class="text-muted-foreground hover:text-foreground">About</button>
+					</li>
+					<li>
+						<button type="button" class="text-muted-foreground hover:text-foreground">Blog</button>
+					</li>
+					<li>
+						<button type="button" class="text-muted-foreground hover:text-foreground"
+							>Contact</button
+						>
+					</li>
+					<li>
+						<button type="button" class="text-muted-foreground hover:text-foreground"
+							>Privacy</button
+						>
+					</li>
 				</ul>
 			</div>
 		</div>
