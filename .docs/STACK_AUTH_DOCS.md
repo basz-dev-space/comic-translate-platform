@@ -1,10 +1,9 @@
 # Setup
+
 URL: /docs/getting-started/setup
 Source: /vercel/path0/docs/content/docs/(guides)/getting-started/setup.mdx
 
-
-
-***
+---
 
 ## title: Setup
 
@@ -12,10 +11,10 @@ Source: /vercel/path0/docs/content/docs/(guides)/getting-started/setup.mdx
 
 Before getting started, make sure you have a project set up for your chosen platform:
 
-* **Next.js**: A [Next.js project](https://nextjs.org/docs/getting-started/installation) using the app router (Stack Auth does not support the pages router on Next.js)
-* **React**: A [React project](https://react.dev/learn/creating-a-react-app) (we show examples with Vite)
-* **JavaScript**: A Node.js project with Express
-* **Python**: A Python environment with your chosen framework (Django, FastAPI, or Flask)
+- **Next.js**: A [Next.js project](https://nextjs.org/docs/getting-started/installation) using the app router (Stack Auth does not support the pages router on Next.js)
+- **React**: A [React project](https://react.dev/learn/creating-a-react-app) (we show examples with Vite)
+- **JavaScript**: A Node.js project with Express
+- **Python**: A Python environment with your chosen framework (Django, FastAPI, or Flask)
 
 We recommend using our **setup wizard** for JavaScript frameworks for a seamless installation experience. For Python, we recommend using the REST API approach.
 
@@ -99,6 +98,7 @@ We recommend using our **setup wizard** for JavaScript frameworks for a seamless
 
       * `stack/server.ts`: Contains the `stackServerApp` configuration
     </Steps>
+
   </TabsContent>
 
   <TabsContent value="manual">
@@ -531,6 +531,7 @@ We recommend using our **setup wizard** for JavaScript frameworks for a seamless
         ### Done!
       </Step>
     </Steps>
+
   </TabsContent>
 </Tabs>
 
@@ -629,14 +630,14 @@ Here are some basic usage examples for each platform:
 **Server Component:**
 
 ```typescript title="Server Component"
-import { stackServerApp } from "@/stack/server";
+import { stackServerApp } from '@/stack/server';
 
 // In a Server Component or API route
 const user = await stackServerApp.getUser();
 if (user) {
-  console.log("User is signed in:", user.displayName);
+	console.log('User is signed in:', user.displayName);
 } else {
-  console.log("User is not signed in");
+	console.log('User is not signed in');
 }
 ```
 
@@ -648,7 +649,7 @@ import { useUser } from "@stackframe/stack";
 
 export default function MyComponent() {
   const user = useUser();
-  
+
   if (user) {
     return <div>Hello, {user.displayName}!</div>;
   } else {
@@ -664,7 +665,7 @@ import { useUser } from "@stackframe/react";
 
 export default function MyComponent() {
   const user = useUser();
-  
+
   if (user) {
     return <div>Hello, {user.displayName}!</div>;
   } else {
@@ -676,42 +677,42 @@ export default function MyComponent() {
 **server.ts:**
 
 ```typescript title="server.ts"
-import { stackServerApp } from "./stack/server.js";
+import { stackServerApp } from './stack/server.js';
 
 app.get('/profile', async (req, res) => {
-  try {
-    // Get access token from request headers
-    const accessToken = req.headers['x-stack-access-token'];
-    const user = await stackServerApp.getUser({ accessToken });
-    
-    if (user) {
-      res.json({ message: `Hello, ${user.displayName}!` });
-    } else {
-      res.status(401).json({ error: 'Not authenticated' });
-    }
-  } catch (error) {
-    res.status(500).json({ error: 'Server error' });
-  }
+	try {
+		// Get access token from request headers
+		const accessToken = req.headers['x-stack-access-token'];
+		const user = await stackServerApp.getUser({ accessToken });
+
+		if (user) {
+			res.json({ message: `Hello, ${user.displayName}!` });
+		} else {
+			res.status(401).json({ error: 'Not authenticated' });
+		}
+	} catch (error) {
+		res.status(500).json({ error: 'Server error' });
+	}
 });
 ```
 
 **index.js:**
 
 ```javascript title="index.js"
-import { stackServerApp } from "./stack/server.js";
+import { stackServerApp } from './stack/server.js';
 
 async function checkUser(accessToken) {
-  try {
-    const user = await stackServerApp.getUser({ accessToken });
-    
-    if (user) {
-      console.log(`Hello, ${user.displayName}!`);
-    } else {
-      console.log('User not authenticated');
-    }
-  } catch (error) {
-    console.error('Error:', error);
-  }
+	try {
+		const user = await stackServerApp.getUser({ accessToken });
+
+		if (user) {
+			console.log(`Hello, ${user.displayName}!`);
+		} else {
+			console.log('User not authenticated');
+		}
+	} catch (error) {
+		console.error('Error:', error);
+	}
 }
 ```
 
@@ -722,7 +723,7 @@ async function checkUser(accessToken) {
 def profile_view(request):
     # Get access token from request headers
     access_token = request.headers.get('X-Stack-Access-Token')
-    
+
     try:
         user_data = stack_auth_request('GET', '/api/v1/users/me', headers={
             'x-stack-access-token': access_token,
@@ -743,7 +744,7 @@ app = FastAPI()
 async def get_profile(x_stack_access_token: str = Header(None)):
     if not x_stack_access_token:
         raise HTTPException(status_code=401, detail="Access token required")
-    
+
     try:
         user_data = stack_auth_request('GET', '/api/v1/users/me', headers={
             'x-stack-access-token': x_stack_access_token,
@@ -763,10 +764,10 @@ app = Flask(__name__)
 @app.route('/profile')
 def profile():
     access_token = request.headers.get('X-Stack-Access-Token')
-    
+
     if not access_token:
         return jsonify({'error': 'Access token required'}), 401
-    
+
     try:
         user_data = stack_auth_request('GET', '/api/v1/users/me', headers={
     'x-stack-access-token': access_token,
@@ -781,4 +782,3 @@ def profile():
 Next up, we will show you how to [retrieve and update user information](./users.mdx), and how to [protect a page](./users.mdx#protecting-a-page) from unauthorized access.
 
 For Python developers, check out the [REST API documentation](../rest-api/overview.mdx) to learn more about the available endpoints and how to use them in your Python application.
-
