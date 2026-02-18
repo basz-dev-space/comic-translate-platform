@@ -846,7 +846,7 @@ export default function Page() {
 	// Redirects to the Google authorization page, requesting access to Google Drive
 	const account = user.useConnectedAccount('google', {
 		or: 'redirect',
-		scopes: ['https://www.googleapis.com/authdrive.readonly']
+		scopes: ['https://www.googleapis.com/auth/drive.readonly']
 	});
 	// Account is always defined because of the redirect
 	return <div>Google Drive connected</div>;
