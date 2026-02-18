@@ -1,10 +1,13 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { resolve } from '$app/paths';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import { Avatar, AvatarFallback } from '$lib/components/ui/avatar';
 	import * as DropdownMenu from '$lib/components/ui/dropdown-menu';
 	import UserIcon from '@lucide/svelte/icons/user';
 	import LogOutIcon from '@lucide/svelte/icons/log-out';
+	import LayoutDashboardIcon from '@lucide/svelte/icons/layout-dashboard';
+	import SettingsIcon from '@lucide/svelte/icons/settings';
 	import MenuIcon from '@lucide/svelte/icons/menu';
 	import XIcon from '@lucide/svelte/icons/x';
 	import LanguagesIcon from '@lucide/svelte/icons/languages';
@@ -47,21 +50,21 @@
 		<nav class="hidden items-center gap-8 md:flex">
 			<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 			<a
-				href="/#features"
+				href={resolve('/#features')}
 				class="font-body text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
 			>
 				Features
 			</a>
 			<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 			<a
-				href="/#how-it-works"
+				href={resolve('/#how-it-works')}
 				class="font-body text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
 			>
 				How it Works
 			</a>
 			<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
 			<a
-				href="/#pricing"
+				href={resolve('/#pricing')}
 				class="font-body text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
 			>
 				Pricing
@@ -83,9 +86,13 @@
 						</Button>
 					</DropdownMenu.Trigger>
 					<DropdownMenu.Content align="end">
-						<DropdownMenu.Item>
-							<UserIcon class="mr-2 h-4 w-4" />
-							Profile
+						<DropdownMenu.Item href="/dashboard">
+							<LayoutDashboardIcon class="mr-2 h-4 w-4" />
+							Dashboard
+						</DropdownMenu.Item>
+						<DropdownMenu.Item href="/dashboard#account">
+							<SettingsIcon class="mr-2 h-4 w-4" />
+							Manage account
 						</DropdownMenu.Item>
 						<DropdownMenu.Separator />
 						<DropdownMenu.Item onclick={handleSignOut}>
@@ -122,16 +129,33 @@
 		<div class="border-t-2 border-ink bg-paper p-4 md:hidden">
 			<nav class="flex flex-col gap-4">
 				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-				<a href="/#features" class="font-body font-medium" onclick={closeMobileMenu}>Features</a>
+				<a href={resolve('/#features')} class="font-body font-medium" onclick={closeMobileMenu}
+					>Features</a
+				>
 				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-				<a href="/#how-it-works" class="font-body font-medium" onclick={closeMobileMenu}
+				<a href={resolve('/#how-it-works')} class="font-body font-medium" onclick={closeMobileMenu}
 					>How it Works</a
 				>
 				<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-				<a href="/#pricing" class="font-body font-medium" onclick={closeMobileMenu}>Pricing</a>
+				<a href={resolve('/#pricing')} class="font-body font-medium" onclick={closeMobileMenu}
+					>Pricing</a
+				>
 				<hr class="border-ink" />
 				{#if user}
-					<Button onclick={handleSignOut} variant="outline" class="w-full">Sign Out</Button>
+					<Button href="/dashboard" onclick={closeMobileMenu} variant="outline" class="w-full">
+						<LayoutDashboardIcon class="mr-2 h-4 w-4" />
+						Dashboard
+					</Button>
+					<Button
+						href="/dashboard#account"
+						onclick={closeMobileMenu}
+						variant="outline"
+						class="w-full"
+					>
+						<UserIcon class="mr-2 h-4 w-4" />
+						Manage account
+					</Button>
+					<Button onclick={handleSignOut} variant="destructive" class="w-full">Sign Out</Button>
 				{:else}
 					<div class="flex flex-col gap-2">
 						<Button href="/api/auth/login" variant="outline" class="w-full">Sign In</Button>
