@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { ActionData, PageData } from './$types';
-	import { base } from '$app/paths';
+	import { resolve } from '$app/paths';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Card from '$lib/components/ui/card/card.svelte';
 	import CardContent from '$lib/components/ui/card/card-content.svelte';
@@ -125,7 +125,8 @@
 				<div class="rounded-lg border-2 border-dashed p-6 text-center">
 					<FolderKanbanIcon class="mx-auto h-8 w-8 text-muted-foreground" />
 					<p class="mt-2 text-sm text-muted-foreground">
-						<a href="{base}/projects" class="text-primary hover:underline">Create a project first</a
+						<a href={resolve('/projects')} class="text-primary hover:underline"
+							>Create a project first</a
 						> to add chapters.
 					</p>
 				</div>
@@ -267,7 +268,7 @@
 					<CardContent class="p-4">
 						<div class="flex items-center justify-between gap-3">
 							<div class="flex-1">
-								<a href="{base}/chapter/{item.id}" class="group/title">
+								<a href={resolve(`/chapter/${item.id}`)} class="group/title">
 									<h3 class="font-display text-lg group-hover/title:text-manga-accent">
 										Chapter {item.chapterNumber}: {item.title}
 									</h3>

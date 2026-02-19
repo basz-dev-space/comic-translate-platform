@@ -1,4 +1,4 @@
-import type { CanvasElement, TextElement, ImageElement, TextProperties } from '../types/elements';
+import type { CanvasElement, TextElement, TextProperties } from '../types/elements';
 
 function generateId(): string {
 	return `el_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
@@ -161,7 +161,10 @@ function createCanvasStore() {
 			const element = elements.find((el) => el.id === id);
 			if (!element) return;
 			const filtered = elements.filter((el) => el.id !== id);
-			elements = [{ ...element, zIndex: 0 }, ...filtered.map((el, i) => ({ ...el, zIndex: i + 1 }))];
+			elements = [
+				{ ...element, zIndex: 0 },
+				...filtered.map((el, i) => ({ ...el, zIndex: i + 1 }))
+			];
 		},
 
 		getElement(id: string) {

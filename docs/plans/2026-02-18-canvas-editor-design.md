@@ -12,41 +12,41 @@ This document presents the design for a rich-featured canvas editor component fo
 
 ### Features from Canva
 
-| Feature | Description | Priority |
-|---------|-------------|----------|
-| Drag-and-drop interface | Intuitive element manipulation | High |
-| Text styling toolbar | Font, size, color, alignment controls | High |
-| Layer panel | Visual layer management with reordering | High |
-| Zoom controls | Zoom in/out with fit-to-screen | High |
-| Undo/Redo | History management | High |
-| Element alignment | Snap-to-grid, smart guides | Medium |
-| Templates | Pre-configured text box layouts | Low |
-| Export options | PNG, JPG, PDF export | High |
+| Feature                 | Description                             | Priority |
+| ----------------------- | --------------------------------------- | -------- |
+| Drag-and-drop interface | Intuitive element manipulation          | High     |
+| Text styling toolbar    | Font, size, color, alignment controls   | High     |
+| Layer panel             | Visual layer management with reordering | High     |
+| Zoom controls           | Zoom in/out with fit-to-screen          | High     |
+| Undo/Redo               | History management                      | High     |
+| Element alignment       | Snap-to-grid, smart guides              | Medium   |
+| Templates               | Pre-configured text box layouts         | Low      |
+| Export options          | PNG, JPG, PDF export                    | High     |
 
 ### Features from Photoshop
 
-| Feature | Description | Priority |
-|---------|-------------|----------|
-| Transform controls | Resize, rotate, skew text boxes | High |
-| Selection tools | Marquee, lasso for region selection | Medium |
-| Layer effects | Drop shadow, stroke, glow for text | Medium |
-| Opacity/Blending | Layer opacity and blend modes | Medium |
-| Rulers & Guides | Measurement and alignment aids | Low |
-| Canvas navigation | Pan, zoom with keyboard shortcuts | High |
-| History panel | Visual history with state jumping | Medium |
+| Feature            | Description                         | Priority |
+| ------------------ | ----------------------------------- | -------- |
+| Transform controls | Resize, rotate, skew text boxes     | High     |
+| Selection tools    | Marquee, lasso for region selection | Medium   |
+| Layer effects      | Drop shadow, stroke, glow for text  | Medium   |
+| Opacity/Blending   | Layer opacity and blend modes       | Medium   |
+| Rulers & Guides    | Measurement and alignment aids      | Low      |
+| Canvas navigation  | Pan, zoom with keyboard shortcuts   | High     |
+| History panel      | Visual history with state jumping   | Medium   |
 
 ### Features from Google Sheets/Excel
 
-| Feature | Description | Priority |
-|---------|-------------|----------|
-| Grid view | Spreadsheet-style translation list | High |
-| Cell editing | Direct inline text editing | High |
-| Column sorting | Sort by status, page, text length | Medium |
-| Filtering | Filter by translation status | High |
-| Batch operations | Multi-select and bulk edit | High |
-| Copy/paste | Clipboard operations | High |
-| Status indicators | Color-coded translation status | High |
-| Find & replace | Search across all translations | Medium |
+| Feature           | Description                        | Priority |
+| ----------------- | ---------------------------------- | -------- |
+| Grid view         | Spreadsheet-style translation list | High     |
+| Cell editing      | Direct inline text editing         | High     |
+| Column sorting    | Sort by status, page, text length  | Medium   |
+| Filtering         | Filter by translation status       | High     |
+| Batch operations  | Multi-select and bulk edit         | High     |
+| Copy/paste        | Clipboard operations               | High     |
+| Status indicators | Color-coded translation status     | High     |
+| Find & replace    | Search across all translations     | Medium   |
 
 ## Proposed Approaches
 
@@ -55,6 +55,7 @@ This document presents the design for a rich-featured canvas editor component fo
 **Technology:** Konva.js + React-Konva patterns adapted for Svelte
 
 **Pros:**
+
 - Excellent performance with large canvases
 - Built-in layer management
 - Good transform controls
@@ -62,10 +63,12 @@ This document presents the design for a rich-featured canvas editor component fo
 - Works well with Svelte (no React dependency required)
 
 **Cons:**
+
 - Requires custom Svelte wrappers
 - Less built-in UI components than Fabric.js
 
 **Architecture:**
+
 ```
 CanvasEditor/
 ├── Canvas.svelte          # Main Konva stage
@@ -90,17 +93,20 @@ CanvasEditor/
 **Technology:** Fabric.js with Svelte integration
 
 **Pros:**
+
 - Rich built-in object manipulation
 - Excellent text rendering capabilities
 - Strong SVG support
 - Many ready-to-use features
 
 **Cons:**
+
 - Larger bundle size
 - Performance can degrade with many objects
 - Less modern API compared to Konva
 
 **Architecture:**
+
 ```
 CanvasEditor/
 ├── Canvas.svelte          # Fabric canvas wrapper
@@ -117,11 +123,13 @@ CanvasEditor/
 **Technology:** Pure HTML5 Canvas with custom rendering
 
 **Pros:**
+
 - Maximum control and flexibility
 - Smallest bundle size
 - No external dependencies
 
 **Cons:**
+
 - Significant development effort
 - Must implement all features from scratch
 - Higher maintenance burden
@@ -185,54 +193,57 @@ Using Svelte 5 runes for reactive state:
 ```typescript
 // stores/canvasStore.ts
 interface CanvasElement {
-  id: string;
-  type: 'text' | 'image' | 'shape';
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  rotation: number;
-  opacity: number;
-  visible: boolean;
-  locked: boolean;
-  // Type-specific properties
-  text?: TextProperties;
-  image?: ImageProperties;
+	id: string;
+	type: 'text' | 'image' | 'shape';
+	x: number;
+	y: number;
+	width: number;
+	height: number;
+	rotation: number;
+	opacity: number;
+	visible: boolean;
+	locked: boolean;
+	// Type-specific properties
+	text?: TextProperties;
+	image?: ImageProperties;
 }
 
 interface TextProperties {
-  content: string;
-  originalContent: string;  // For translation
-  translatedContent: string;
-  fontFamily: string;
-  fontSize: number;
-  fontWeight: string;
-  fontStyle: string;
-  textAlign: 'left' | 'center' | 'right';
-  verticalAlign: 'top' | 'middle' | 'bottom';
-  fill: string;
-  stroke: string;
-  strokeWidth: number;
-  lineHeight: number;
-  status: 'pending' | 'translated' | 'reviewed';
+	content: string;
+	originalContent: string; // For translation
+	translatedContent: string;
+	fontFamily: string;
+	fontSize: number;
+	fontWeight: string;
+	fontStyle: string;
+	textAlign: 'left' | 'center' | 'right';
+	verticalAlign: 'top' | 'middle' | 'bottom';
+	fill: string;
+	stroke: string;
+	strokeWidth: number;
+	lineHeight: number;
+	status: 'pending' | 'translated' | 'reviewed';
 }
 ```
 
 ### Key Features Implementation
 
 #### 1. Text Element with Transform Controls
+
 - Bounding box with 8 resize handles
 - Rotation handle above the box
 - Double-click to edit text inline
 - Font toolbar appears on selection
 
 #### 2. Layer Panel
+
 - List of all elements with visibility toggle
 - Lock/unlock elements
 - Reorder via drag-and-drop
 - Layer type icons (text, image, shape)
 
 #### 3. Translation Grid
+
 - Synchronized with canvas elements
 - Real-time updates when canvas changes
 - Status column with color coding
@@ -240,38 +251,41 @@ interface TextProperties {
 - Sort and filter capabilities
 
 #### 4. History Management
+
 - Command pattern for undo/redo
 - State snapshots for complex operations
 - Keyboard shortcuts (Ctrl+Z, Ctrl+Y)
 
 #### 5. Export System
+
 - Canvas to PNG/JPG
 - PDF generation for chapters
 - CSV export for translation grid
 
 ### Keyboard Shortcuts
 
-| Shortcut | Action |
-|----------|--------|
-| V | Selection tool |
-| T | Text tool |
-| Delete/Backspace | Delete selected |
-| Ctrl+Z | Undo |
-| Ctrl+Y / Ctrl+Shift+Z | Redo |
-| Ctrl+C | Copy |
-| Ctrl+V | Paste |
-| Ctrl+D | Duplicate |
-| Ctrl+A | Select all |
-| Arrow keys | Move selection |
-| Shift+Arrow | Move selection (10px) |
-| Ctrl+Shift+] | Bring to front |
-| Ctrl+Shift+[ | Send to back |
-| + / - | Zoom in/out |
-| Ctrl+0 | Fit to screen |
+| Shortcut              | Action                |
+| --------------------- | --------------------- |
+| V                     | Selection tool        |
+| T                     | Text tool             |
+| Delete/Backspace      | Delete selected       |
+| Ctrl+Z                | Undo                  |
+| Ctrl+Y / Ctrl+Shift+Z | Redo                  |
+| Ctrl+C                | Copy                  |
+| Ctrl+V                | Paste                 |
+| Ctrl+D                | Duplicate             |
+| Ctrl+A                | Select all            |
+| Arrow keys            | Move selection        |
+| Shift+Arrow           | Move selection (10px) |
+| Ctrl+Shift+]          | Bring to front        |
+| Ctrl+Shift+[          | Send to back          |
+| + / -                 | Zoom in/out           |
+| Ctrl+0                | Fit to screen         |
 
 ### Responsive Design
 
 The editor will adapt to different screen sizes:
+
 - **Desktop (≥1280px):** Full layout with sidebars
 - **Tablet (768-1279px):** Collapsible sidebars
 - **Mobile (<768px):** Bottom sheet for panels
@@ -280,32 +294,36 @@ The editor will adapt to different screen sizes:
 
 ```json
 {
-  "konva": "^9.x",
-  "svelte-konva": "^1.x"  // If available, or create custom wrappers
+	"konva": "^9.x",
+	"svelte-konva": "^1.x" // If available, or create custom wrappers
 }
 ```
 
 ## Implementation Phases
 
 ### Phase 1: Core Canvas (Week 1)
+
 - Basic Konva setup
 - Image loading and display
 - Text element creation
 - Selection and transform
 
 ### Phase 2: Editing Tools (Week 2)
+
 - Text toolbar
 - Layer panel
 - Properties panel
 - Undo/redo system
 
 ### Phase 3: Translation Grid (Week 3)
+
 - Spreadsheet component
 - Canvas-grid synchronization
 - Batch operations
 - Status management
 
 ### Phase 4: Export & Polish (Week 4)
+
 - Export functionality
 - Keyboard shortcuts
 - Performance optimization

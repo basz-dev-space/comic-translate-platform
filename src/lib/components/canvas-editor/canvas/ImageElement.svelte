@@ -62,7 +62,7 @@
 	<img
 		src={element.image.src}
 		alt=""
-		class="w-full h-full object-cover pointer-events-none"
+		class="pointer-events-none h-full w-full object-cover"
 		draggable="false"
 	/>
 </div>

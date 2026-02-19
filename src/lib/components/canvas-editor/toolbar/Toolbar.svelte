@@ -18,13 +18,13 @@
 </script>
 
 <div
-	class="toolbar flex items-center gap-2 p-2 bg-white border-b border-gray-200"
+	class="toolbar flex items-center gap-2 border-b border-gray-200 bg-white p-2"
 	role="toolbar"
 	aria-label="Editor toolbar"
 >
 	<!-- Tool buttons -->
-	<div class="flex items-center gap-1 pr-2 border-r border-gray-200">
-		{#each tools as tool}
+	<div class="flex items-center gap-1 border-r border-gray-200 pr-2">
+		{#each tools as tool (tool.id)}
 			<button
 				class="tool-button"
 				class:active={selectionStore.activeTool === tool.id}

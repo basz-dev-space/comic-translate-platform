@@ -13,11 +13,13 @@
 ## Task 1: Install Dependencies
 
 **Files:**
+
 - Modify: `package.json`
 
 **Step 1: Install Konva.js**
 
 Run:
+
 ```bash
 pnpm add konva
 ```
@@ -25,9 +27,11 @@ pnpm add konva
 **Step 2: Verify installation**
 
 Run:
+
 ```bash
 pnpm list konva
 ```
+
 Expected: konva@9.x.x
 
 **Step 3: Commit**
@@ -42,6 +46,7 @@ git commit -m "chore: add konva dependency for canvas editor"
 ## Task 2: Create Type Definitions
 
 **Files:**
+
 - Create: `src/lib/components/canvas-editor/types/elements.ts`
 - Create: `src/lib/components/canvas-editor/types/history.ts`
 - Create: `src/lib/components/canvas-editor/types/tools.ts`
@@ -202,6 +207,7 @@ git commit -m "feat(canvas-editor): add type definitions for elements, history, 
 ## Task 3: Create Canvas Store
 
 **Files:**
+
 - Create: `src/lib/components/canvas-editor/stores/canvasStore.ts`
 - Create: `src/lib/components/canvas-editor/stores/selectionStore.ts`
 - Create: `src/lib/components/canvas-editor/stores/historyStore.ts`
@@ -229,12 +235,24 @@ function createCanvasStore() {
 	let height = $state(600);
 
 	return {
-		get elements() { return elements; },
-		get zoom() { return zoom; },
-		get panX() { return panX; },
-		get panY() { return panY; },
-		get width() { return width; },
-		get height() { return height; },
+		get elements() {
+			return elements;
+		},
+		get zoom() {
+			return zoom;
+		},
+		get panX() {
+			return panX;
+		},
+		get panY() {
+			return panY;
+		},
+		get width() {
+			return width;
+		},
+		get height() {
+			return height;
+		},
 
 		setDimensions(w: number, h: number) {
 			width = w;
@@ -261,24 +279,24 @@ function createCanvasStore() {
 		},
 
 		updateElement(id: string, updates: Partial<CanvasElement>) {
-			elements = elements.map(el => 
-				el.id === id ? { ...el, ...updates } as CanvasElement : el
+			elements = elements.map((el) =>
+				el.id === id ? ({ ...el, ...updates } as CanvasElement) : el
 			);
 		},
 
 		deleteElement(id: string) {
-			elements = elements.filter(el => el.id !== id);
+			elements = elements.filter((el) => el.id !== id);
 		},
 
 		deleteElements(ids: string[]) {
-			elements = elements.filter(el => !ids.includes(el.id));
+			elements = elements.filter((el) => !ids.includes(el.id));
 		},
 
 		reorderElement(id: string, newZIndex: number) {
-			const element = elements.find(el => el.id === id);
+			const element = elements.find((el) => el.id === id);
 			if (!element) return;
-			
-			const filtered = elements.filter(el => el.id !== id);
+
+			const filtered = elements.filter((el) => el.id !== id);
 			const reordered = [
 				...filtered.slice(0, newZIndex),
 				{ ...element, zIndex: newZIndex },
@@ -288,11 +306,11 @@ function createCanvasStore() {
 		},
 
 		getElement(id: string) {
-			return elements.find(el => el.id === id);
+			return elements.find((el) => el.id === id);
 		},
 
 		getElementsByIds(ids: string[]) {
-			return elements.filter(el => ids.includes(el.id));
+			return elements.filter((el) => ids.includes(el.id));
 		},
 
 		setElements(newElements: CanvasElement[]) {
@@ -318,11 +336,21 @@ function createSelectionStore() {
 	let activeTool = $state<'select' | 'text' | 'pan' | 'zoom'>('select');
 
 	return {
-		get selectedIds() { return selectedIds; },
-		get selectedIdsArray() { return Array.from(selectedIds); },
-		get activeTool() { return activeTool; },
-		get hasSelection() { return selectedIds.size > 0; },
-		get isMultiSelect() { return selectedIds.size > 1; },
+		get selectedIds() {
+			return selectedIds;
+		},
+		get selectedIdsArray() {
+			return Array.from(selectedIds);
+		},
+		get activeTool() {
+			return activeTool;
+		},
+		get hasSelection() {
+			return selectedIds.size > 0;
+		},
+		get isMultiSelect() {
+			return selectedIds.size > 1;
+		},
 
 		setActiveTool(tool: typeof activeTool) {
 			activeTool = tool;
@@ -384,9 +412,15 @@ function createHistoryStore() {
 	const maxHistory = 50;
 
 	return {
-		get canUndo() { return past.length > 0; },
-		get canRedo() { return future.length > 0; },
-		get historyLength() { return past.length; },
+		get canUndo() {
+			return past.length > 0;
+		},
+		get canRedo() {
+			return future.length > 0;
+		},
+		get historyLength() {
+			return past.length;
+		},
 
 		push(action: HistoryAction) {
 			past = [...past, action].slice(-maxHistory);
@@ -435,7 +469,9 @@ function createSettingsStore() {
 	let settings = $state<EditorSettings>({ ...DEFAULT_SETTINGS });
 
 	return {
-		get settings() { return settings; },
+		get settings() {
+			return settings;
+		},
 
 		update(updates: Partial<EditorSettings>) {
 			settings = { ...settings, ...updates };
@@ -485,6 +521,7 @@ git commit -m "feat(canvas-editor): add state management stores with Svelte 5 ru
 ## Task 4: Create Utility Functions
 
 **Files:**
+
 - Create: `src/lib/components/canvas-editor/utils/transformers.ts`
 - Create: `src/lib/components/canvas-editor/utils/exporters.ts`
 - Create: `src/lib/components/canvas-editor/utils/keyboard.ts`
@@ -539,7 +576,7 @@ export function constrainAspectRatio(
 	aspectRatio: number
 ): { width: number; height: number } {
 	const newAspectRatio = newWidth / newHeight;
-	
+
 	if (newAspectRatio > aspectRatio) {
 		return { width: newHeight * aspectRatio, height: newHeight };
 	} else {
@@ -557,23 +594,19 @@ export function rotatePoint(
 	const radians = (angle * Math.PI) / 180;
 	const cos = Math.cos(radians);
 	const sin = Math.sin(radians);
-	
+
 	const nx = cos * (x - cx) - sin * (y - cy) + cx;
 	const ny = sin * (x - cx) + cos * (y - cy) + cy;
-	
+
 	return { x: nx, y: ny };
 }
 
-export function isPointInRotatedRect(
-	px: number,
-	py: number,
-	box: TransformBox
-): boolean {
+export function isPointInRotatedRect(px: number, py: number, box: TransformBox): boolean {
 	const cx = box.x + box.width / 2;
 	const cy = box.y + box.height / 2;
-	
+
 	const rotated = rotatePoint(px, py, cx, cy, -box.rotation);
-	
+
 	return (
 		rotated.x >= box.x &&
 		rotated.x <= box.x + box.width &&
@@ -607,7 +640,7 @@ export function canvasToDataURL(
 	options: Partial<ExportOptions> = {}
 ): string {
 	const opts = { ...DEFAULT_EXPORT_OPTIONS, ...options };
-	
+
 	const mimeType = opts.format === 'jpg' ? 'image/jpeg' : 'image/png';
 	return canvas.toDataURL(mimeType, opts.quality);
 }
@@ -621,11 +654,9 @@ export function downloadDataURL(dataURL: string, filename: string): void {
 	document.body.removeChild(link);
 }
 
-export function exportTranslationGrid(
-	elements: TextElement[]
-): string {
+export function exportTranslationGrid(elements: TextElement[]): string {
 	const headers = ['ID', 'Original', 'Translated', 'Status', 'X', 'Y', 'Width', 'Height'];
-	const rows = elements.map(el => [
+	const rows = elements.map((el) => [
 		el.id,
 		el.text.originalContent,
 		el.text.translatedContent,
@@ -635,12 +666,12 @@ export function exportTranslationGrid(
 		el.width.toString(),
 		el.height.toString()
 	]);
-	
+
 	const csv = [
 		headers.join(','),
-		...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+		...rows.map((row) => row.map((cell) => `"${cell}"`).join(','))
 	].join('\n');
-	
+
 	return csv;
 }
 
@@ -671,21 +702,18 @@ export interface KeyboardShortcut {
 	description: string;
 }
 
-export function matchesShortcut(
-	event: KeyboardEvent,
-	shortcut: KeyboardShortcut
-): boolean {
+export function matchesShortcut(event: KeyboardEvent, shortcut: KeyboardShortcut): boolean {
 	const keyMatch = event.key.toLowerCase() === shortcut.key.toLowerCase();
 	const ctrlMatch = !!shortcut.ctrl === (event.ctrlKey || event.metaKey);
 	const shiftMatch = !!shortcut.shift === event.shiftKey;
 	const altMatch = !!shortcut.alt === event.altKey;
-	
+
 	return keyMatch && ctrlMatch && shiftMatch && altMatch;
 }
 
 export function formatShortcut(shortcut: KeyboardShortcut): string {
 	const parts: string[] = [];
-	
+
 	if (shortcut.ctrl) {
 		parts.push(navigator.platform.includes('Mac') ? '⌘' : 'Ctrl');
 	}
@@ -696,7 +724,7 @@ export function formatShortcut(shortcut: KeyboardShortcut): string {
 		parts.push(navigator.platform.includes('Mac') ? '⌥' : 'Alt');
 	}
 	parts.push(shortcut.key.toUpperCase());
-	
+
 	return parts.join('+');
 }
 
@@ -741,6 +769,7 @@ git commit -m "feat(canvas-editor): add utility functions for transforms, export
 ## Task 5: Create Main Canvas Component
 
 **Files:**
+
 - Create: `src/lib/components/canvas-editor/canvas/Canvas.svelte`
 - Create: `src/lib/components/canvas-editor/canvas/TextElement.svelte`
 - Create: `src/lib/components/canvas-editor/canvas/ImageElement.svelte`
@@ -792,9 +821,7 @@ Create file `src/lib/components/canvas-editor/canvas/Canvas.svelte`:
 	function handleWheel(e: WheelEvent) {
 		e.preventDefault();
 		const scaleBy = 1.1;
-		const newZoom = e.deltaY < 0 
-			? canvasStore.zoom * scaleBy 
-			: canvasStore.zoom / scaleBy;
+		const newZoom = e.deltaY < 0 ? canvasStore.zoom * scaleBy : canvasStore.zoom / scaleBy;
 		canvasStore.setZoom(newZoom);
 	}
 
@@ -806,8 +833,8 @@ Create file `src/lib/components/canvas-editor/canvas/Canvas.svelte`:
 	}
 </script>
 
-<div 
-	class="canvas-container relative overflow-hidden bg-gray-100 border border-gray-300 rounded-lg"
+<div
+	class="canvas-container relative overflow-hidden rounded-lg border border-gray-300 bg-gray-100"
 	bind:this={container}
 	style="width: {width}px; height: {height}px;"
 	onwheel={handleWheel}
@@ -817,10 +844,10 @@ Create file `src/lib/components/canvas-editor/canvas/Canvas.svelte`:
 	tabindex="0"
 >
 	{#if backgroundImage}
-		<img 
-			src={backgroundImage} 
-			alt="Background" 
-			class="absolute inset-0 w-full h-full object-contain pointer-events-none"
+		<img
+			src={backgroundImage}
+			alt="Background"
+			class="pointer-events-none absolute inset-0 h-full w-full object-contain"
 		/>
 	{/if}
 
@@ -914,7 +941,10 @@ Create file `src/lib/components/canvas-editor/canvas/TextElement.svelte`:
 	aria-label="Text element: {element.text.content}"
 	tabindex="0"
 >
-	<span class="flex items-center justify-center w-full h-full" style="vertical-align: {element.text.verticalAlign}">
+	<span
+		class="flex h-full w-full items-center justify-center"
+		style="vertical-align: {element.text.verticalAlign}"
+	>
 		{element.text.translatedContent || element.text.content}
 	</span>
 </div>
@@ -988,7 +1018,7 @@ Create file `src/lib/components/canvas-editor/canvas/ImageElement.svelte`:
 	<img
 		src={element.image.src}
 		alt=""
-		class="w-full h-full object-cover pointer-events-none"
+		class="pointer-events-none h-full w-full object-cover"
 		draggable="false"
 	/>
 </div>
@@ -1025,7 +1055,7 @@ Create file `src/lib/components/canvas-editor/canvas/TransformControls.svelte`:
 	import { getBoundingBox } from '../utils/transformers';
 
 	const selectedElements = $derived(
-		selectionStore.selectedIdsArray.map(id => canvasStore.getElement(id)).filter(Boolean)
+		selectionStore.selectedIdsArray.map((id) => canvasStore.getElement(id)).filter(Boolean)
 	);
 
 	const boundingBox = $derived(getBoundingBox(selectedElements));
@@ -1048,7 +1078,7 @@ Create file `src/lib/components/canvas-editor/canvas/TransformControls.svelte`:
 	function startResize(handle: string, e: MouseEvent) {
 		e.stopPropagation();
 		if (!boundingBox) return;
-		
+
 		isDragging = true;
 		activeHandle = handle;
 		startPos = {
@@ -1061,30 +1091,36 @@ Create file `src/lib/components/canvas-editor/canvas/TransformControls.svelte`:
 
 	function handleMouseMove(e: MouseEvent) {
 		if (!isDragging || !boundingBox || !activeHandle) return;
-		
+
 		const dx = e.movementX;
 		const dy = e.movementY;
-		
+
 		// Calculate new dimensions based on handle
 		let newX = startPos.x;
 		let newY = startPos.y;
 		let newWidth = startPos.width;
 		let newHeight = startPos.height;
-		
+
 		if (activeHandle.includes('e')) newWidth += dx;
-		if (activeHandle.includes('w')) { newX += dx; newWidth -= dx; }
+		if (activeHandle.includes('w')) {
+			newX += dx;
+			newWidth -= dx;
+		}
 		if (activeHandle.includes('s')) newHeight += dy;
-		if (activeHandle.includes('n')) { newY += dy; newHeight -= dy; }
-		
+		if (activeHandle.includes('n')) {
+			newY += dy;
+			newHeight -= dy;
+		}
+
 		// Update all selected elements proportionally
 		const scaleX = newWidth / startPos.width;
 		const scaleY = newHeight / startPos.height;
-		
+
 		for (const el of selectedElements) {
 			if (!el) continue;
 			const relX = (el.x - startPos.x) / startPos.width;
 			const relY = (el.y - startPos.y) / startPos.height;
-			
+
 			canvasStore.updateElement(el.id, {
 				x: newX + relX * newWidth,
 				y: newY + relY * newHeight,
@@ -1104,7 +1140,7 @@ Create file `src/lib/components/canvas-editor/canvas/TransformControls.svelte`:
 
 {#if boundingBox}
 	<div
-		class="transform-controls absolute pointer-events-none"
+		class="transform-controls pointer-events-none absolute"
 		style="
 			left: {boundingBox.x}px;
 			top: {boundingBox.y}px;
@@ -1136,7 +1172,14 @@ Create file `src/lib/components/canvas-editor/canvas/TransformControls.svelte`:
 			aria-label="Rotate"
 			tabindex="0"
 		>
-			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+			<svg
+				width="16"
+				height="16"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+			>
 				<path d="M21 12a9 9 0 11-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
 				<path d="M21 3v5h-5" />
 			</svg>
@@ -1201,6 +1244,7 @@ git commit -m "feat(canvas-editor): add main canvas components with transform co
 ## Task 6: Create Toolbar Components
 
 **Files:**
+
 - Create: `src/lib/components/canvas-editor/toolbar/Toolbar.svelte`
 - Create: `src/lib/components/canvas-editor/toolbar/TextToolbar.svelte`
 - Create: `src/lib/components/canvas-editor/toolbar/ZoomControls.svelte`
@@ -1229,9 +1273,13 @@ Create file `src/lib/components/canvas-editor/toolbar/Toolbar.svelte`:
 	}
 </script>
 
-<div class="toolbar flex items-center gap-2 p-2 bg-white border-b border-gray-200" role="toolbar" aria-label="Editor toolbar">
+<div
+	class="toolbar flex items-center gap-2 border-b border-gray-200 bg-white p-2"
+	role="toolbar"
+	aria-label="Editor toolbar"
+>
 	<!-- Tool buttons -->
-	<div class="flex items-center gap-1 pr-2 border-r border-gray-200">
+	<div class="flex items-center gap-1 border-r border-gray-200 pr-2">
 		{#each tools as tool}
 			<button
 				class="tool-button"
@@ -1241,17 +1289,38 @@ Create file `src/lib/components/canvas-editor/toolbar/Toolbar.svelte`:
 				aria-pressed={selectionStore.activeTool === tool.id}
 			>
 				{#if tool.icon === 'cursor'}
-					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+					<svg
+						width="18"
+						height="18"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+					>
 						<path d="M3 3l7.07 16.97 2.51-7.39 7.39-2.51L3 3z" />
 					</svg>
 				{:else if tool.icon === 'type'}
-					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+					<svg
+						width="18"
+						height="18"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+					>
 						<polyline points="4 7 4 4 20 4 20 7" />
 						<line x1="9" y1="20" x2="15" y2="20" />
 						<line x1="12" y1="4" x2="12" y2="20" />
 					</svg>
 				{:else if tool.icon === 'move'}
-					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+					<svg
+						width="18"
+						height="18"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+					>
 						<polyline points="5 9 2 12 5 15" />
 						<polyline points="9 5 12 2 15 5" />
 						<polyline points="15 19 12 22 9 19" />
@@ -1260,7 +1329,14 @@ Create file `src/lib/components/canvas-editor/toolbar/Toolbar.svelte`:
 						<line x1="12" y1="2" x2="12" y2="22" />
 					</svg>
 				{:else if tool.icon === 'zoom-in'}
-					<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+					<svg
+						width="18"
+						height="18"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+					>
 						<circle cx="11" cy="11" r="8" />
 						<line x1="21" y1="21" x2="16.65" y2="16.65" />
 						<line x1="11" y1="8" x2="11" y2="14" />
@@ -1338,7 +1414,7 @@ Create file `src/lib/components/canvas-editor/toolbar/TextToolbar.svelte`:
 
 	const selectedTextElements = $derived(
 		selectionStore.selectedIdsArray
-			.map(id => canvasStore.getElement(id))
+			.map((id) => canvasStore.getElement(id))
 			.filter((el): el is TextElement => el?.type === 'text')
 	);
 
@@ -1368,7 +1444,7 @@ Create file `src/lib/components/canvas-editor/toolbar/TextToolbar.svelte`:
 </script>
 
 {#if hasTextSelection}
-	<div class="text-toolbar flex items-center gap-2 pl-2 border-l border-gray-200">
+	<div class="text-toolbar flex items-center gap-2 border-l border-gray-200 pl-2">
 		<!-- Font family -->
 		<select
 			class="font-select"
@@ -1399,7 +1475,14 @@ Create file `src/lib/components/canvas-editor/toolbar/TextToolbar.svelte`:
 			title="Bold (Ctrl+B)"
 			aria-label="Bold"
 		>
-			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+			<svg
+				width="16"
+				height="16"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="3"
+			>
 				<path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z" />
 				<path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z" />
 			</svg>
@@ -1413,7 +1496,14 @@ Create file `src/lib/components/canvas-editor/toolbar/TextToolbar.svelte`:
 			title="Italic (Ctrl+I)"
 			aria-label="Italic"
 		>
-			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+			<svg
+				width="16"
+				height="16"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+			>
 				<line x1="19" y1="4" x2="10" y2="4" />
 				<line x1="14" y1="20" x2="5" y2="20" />
 				<line x1="15" y1="4" x2="9" y2="20" />
@@ -1428,7 +1518,14 @@ Create file `src/lib/components/canvas-editor/toolbar/TextToolbar.svelte`:
 				onchange={(e) => updateTextProperty('fill', e.currentTarget.value)}
 				aria-label="Text color"
 			/>
-			<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+			<svg
+				width="16"
+				height="16"
+				viewBox="0 0 24 24"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+			>
 				<path d="M4 20h16" />
 				<path d="M12 4v12" />
 				<path d="M8 8l4-4 4 4" />
@@ -1436,7 +1533,7 @@ Create file `src/lib/components/canvas-editor/toolbar/TextToolbar.svelte`:
 		</label>
 
 		<!-- Alignment -->
-		<div class="flex items-center gap-1 pl-2 border-l border-gray-200">
+		<div class="flex items-center gap-1 border-l border-gray-200 pl-2">
 			<button
 				class="format-button"
 				class:active={selectedTextElements[0]?.text.textAlign === 'left'}
@@ -1444,7 +1541,14 @@ Create file `src/lib/components/canvas-editor/toolbar/TextToolbar.svelte`:
 				title="Align left"
 				aria-label="Align left"
 			>
-				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+				<svg
+					width="16"
+					height="16"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+				>
 					<line x1="3" y1="6" x2="21" y2="6" />
 					<line x1="3" y1="12" x2="15" y2="12" />
 					<line x1="3" y1="18" x2="18" y2="18" />
@@ -1457,7 +1561,14 @@ Create file `src/lib/components/canvas-editor/toolbar/TextToolbar.svelte`:
 				title="Align center"
 				aria-label="Align center"
 			>
-				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+				<svg
+					width="16"
+					height="16"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+				>
 					<line x1="3" y1="6" x2="21" y2="6" />
 					<line x1="6" y1="12" x2="18" y2="12" />
 					<line x1="4" y1="18" x2="20" y2="18" />
@@ -1470,7 +1581,14 @@ Create file `src/lib/components/canvas-editor/toolbar/TextToolbar.svelte`:
 				title="Align right"
 				aria-label="Align right"
 			>
-				<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+				<svg
+					width="16"
+					height="16"
+					viewBox="0 0 24 24"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2"
+				>
 					<line x1="3" y1="6" x2="21" y2="6" />
 					<line x1="9" y1="12" x2="21" y2="12" />
 					<line x1="6" y1="18" x2="21" y2="18" />
@@ -1570,14 +1688,16 @@ Create file `src/lib/components/canvas-editor/toolbar/ZoomControls.svelte`:
 	}
 </script>
 
-<div class="zoom-controls flex items-center gap-1 pl-2 border-l border-gray-200">
-	<button
-		class="zoom-button"
-		onclick={zoomOut}
-		title="Zoom out (Ctrl+-)"
-		aria-label="Zoom out"
-	>
-		<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+<div class="zoom-controls flex items-center gap-1 border-l border-gray-200 pl-2">
+	<button class="zoom-button" onclick={zoomOut} title="Zoom out (Ctrl+-)" aria-label="Zoom out">
+		<svg
+			width="16"
+			height="16"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="2"
+		>
 			<circle cx="11" cy="11" r="8" />
 			<line x1="21" y1="21" x2="16.65" y2="16.65" />
 			<line x1="8" y1="11" x2="14" y2="11" />
@@ -1595,13 +1715,15 @@ Create file `src/lib/components/canvas-editor/toolbar/ZoomControls.svelte`:
 		{/each}
 	</select>
 
-	<button
-		class="zoom-button"
-		onclick={zoomIn}
-		title="Zoom in (Ctrl++)"
-		aria-label="Zoom in"
-	>
-		<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+	<button class="zoom-button" onclick={zoomIn} title="Zoom in (Ctrl++)" aria-label="Zoom in">
+		<svg
+			width="16"
+			height="16"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="2"
+		>
 			<circle cx="11" cy="11" r="8" />
 			<line x1="21" y1="21" x2="16.65" y2="16.65" />
 			<line x1="11" y1="8" x2="11" y2="14" />
@@ -1615,7 +1737,14 @@ Create file `src/lib/components/canvas-editor/toolbar/ZoomControls.svelte`:
 		title="Fit to screen (Ctrl+0)"
 		aria-label="Fit to screen"
 	>
-		<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+		<svg
+			width="16"
+			height="16"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="2"
+		>
 			<path d="M8 3H5a2 2 0 0 0-2 2v3" />
 			<path d="M21 8V5a2 2 0 0 0-2-2h-3" />
 			<path d="M3 16v3a2 2 0 0 0 2 2h3" />
@@ -1678,7 +1807,7 @@ Create file `src/lib/components/canvas-editor/toolbar/UndoRedo.svelte`:
 	}
 </script>
 
-<div class="undo-redo flex items-center gap-1 pr-2 border-r border-gray-200">
+<div class="undo-redo flex items-center gap-1 border-r border-gray-200 pr-2">
 	<button
 		class="history-button"
 		disabled={!historyStore.canUndo}
@@ -1686,7 +1815,14 @@ Create file `src/lib/components/canvas-editor/toolbar/UndoRedo.svelte`:
 		title="Undo (Ctrl+Z)"
 		aria-label="Undo"
 	>
-		<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+		<svg
+			width="16"
+			height="16"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="2"
+		>
 			<path d="M3 7v6h6" />
 			<path d="M21 17a9 9 0 0 0-9-9 9 9 0 0 0-6 2.3L3 13" />
 		</svg>
@@ -1699,7 +1835,14 @@ Create file `src/lib/components/canvas-editor/toolbar/UndoRedo.svelte`:
 		title="Redo (Ctrl+Y)"
 		aria-label="Redo"
 	>
-		<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+		<svg
+			width="16"
+			height="16"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="2"
+		>
 			<path d="M21 7v6h-6" />
 			<path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7" />
 		</svg>
@@ -1744,6 +1887,7 @@ git commit -m "feat(canvas-editor): add toolbar components with text formatting 
 ## Task 7: Create Panel Components
 
 **Files:**
+
 - Create: `src/lib/components/canvas-editor/panels/LayerPanel.svelte`
 - Create: `src/lib/components/canvas-editor/panels/PropertiesPanel.svelte`
 - Create: `src/lib/components/canvas-editor/panels/TranslationGrid.svelte`
@@ -1793,11 +1937,11 @@ Create file `src/lib/components/canvas-editor/panels/LayerPanel.svelte`:
 
 	function handleDrop(targetIndex: number) {
 		if (dragIndex === null || dragIndex === targetIndex) return;
-		
+
 		const elements = [...canvasStore.elements];
 		const [removed] = elements.splice(dragIndex, 1);
 		elements.splice(targetIndex, 0, removed);
-		
+
 		canvasStore.setElements(elements.map((el, idx) => ({ ...el, zIndex: idx })));
 		dragIndex = null;
 	}
@@ -1808,13 +1952,17 @@ Create file `src/lib/components/canvas-editor/panels/LayerPanel.svelte`:
 	}
 </script>
 
-<div class="layer-panel flex flex-col bg-white border-r border-gray-200 w-64" role="region" aria-label="Layers">
-	<div class="panel-header flex items-center justify-between p-3 border-b border-gray-200">
+<div
+	class="layer-panel flex w-64 flex-col border-r border-gray-200 bg-white"
+	role="region"
+	aria-label="Layers"
+>
+	<div class="panel-header flex items-center justify-between border-b border-gray-200 p-3">
 		<h2 class="text-sm font-semibold text-gray-700">Layers</h2>
 		<span class="text-xs text-gray-500">{canvasStore.elements.length} items</span>
 	</div>
 
-	<div class="layer-list flex-1 overflow-y-auto p-2 space-y-1">
+	<div class="layer-list flex-1 space-y-1 overflow-y-auto p-2">
 		{#each [...canvasStore.elements].reverse() as element, i (element.id)}
 			{@const index = canvasStore.elements.length - 1 - i}
 			<div
@@ -1833,13 +1981,27 @@ Create file `src/lib/components/canvas-editor/panels/LayerPanel.svelte`:
 			>
 				<div class="layer-icon">
 					{#if element.type === 'text'}
-						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<svg
+							width="14"
+							height="14"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+						>
 							<polyline points="4 7 4 4 20 4 20 7" />
 							<line x1="9" y1="20" x2="15" y2="20" />
 							<line x1="12" y1="4" x2="12" y2="20" />
 						</svg>
 					{:else if element.type === 'image'}
-						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<svg
+							width="14"
+							height="14"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+						>
 							<rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
 							<circle cx="8.5" cy="8.5" r="1.5" />
 							<polyline points="21 15 16 10 5 21" />
@@ -1863,13 +2025,29 @@ Create file `src/lib/components/canvas-editor/panels/LayerPanel.svelte`:
 						aria-label={element.visible ? 'Hide layer' : 'Show layer'}
 					>
 						{#if element.visible}
-							<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<svg
+								width="12"
+								height="12"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+							>
 								<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
 								<circle cx="12" cy="12" r="3" />
 							</svg>
 						{:else}
-							<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-								<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-1.69-2.42L1 1" />
+							<svg
+								width="12"
+								height="12"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+							>
+								<path
+									d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-1.69-2.42L1 1"
+								/>
 							</svg>
 						{/if}
 					</button>
@@ -1881,12 +2059,26 @@ Create file `src/lib/components/canvas-editor/panels/LayerPanel.svelte`:
 						aria-label={element.locked ? 'Unlock layer' : 'Lock layer'}
 					>
 						{#if element.locked}
-							<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<svg
+								width="12"
+								height="12"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+							>
 								<rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
 								<path d="M7 11V7a5 5 0 0 1 10 0v4" />
 							</svg>
 						{:else}
-							<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+							<svg
+								width="12"
+								height="12"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+							>
 								<rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
 								<path d="M7 11V7a5 5 0 0 1 9.9-1" />
 							</svg>
@@ -1899,17 +2091,24 @@ Create file `src/lib/components/canvas-editor/panels/LayerPanel.svelte`:
 						title="Delete"
 						aria-label="Delete layer"
 					>
-						<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+						<svg
+							width="12"
+							height="12"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2"
+						>
 							<polyline points="3 6 5 6 21 6" />
-							<path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+							<path
+								d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+							/>
 						</svg>
 					</button>
 				</div>
 			</div>
 		{:else}
-			<div class="empty-state text-center text-gray-400 text-xs py-8">
-				No layers yet
-			</div>
+			<div class="empty-state text-center text-gray-400 text-xs py-8">No layers yet</div>
 		{/each}
 	</div>
 </div>
@@ -2131,3 +2330,4 @@ Create file `src/lib/components/canvas-editor/panels/PropertiesPanel.svelte`:
 						class="input-field w-full h-20 resize-none"
 						value={textEl.text.originalContent}
 						onchange={(e) => canvasStore.updateElement(el.id, {
+```

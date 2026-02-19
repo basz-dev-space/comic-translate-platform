@@ -67,9 +67,7 @@
 		dragStart = { x: 0, y: 0 };
 	}
 
-	const displayText = $derived(
-		element.text.translatedContent || element.text.content
-	);
+	const displayText = $derived(element.text.translatedContent || element.text.content);
 </script>
 
 <div
@@ -105,7 +103,7 @@
 >
 	{#if isEditing}
 		<textarea
-			class="edit-textarea w-full h-full resize-none border-none outline-none bg-transparent"
+			class="edit-textarea h-full w-full resize-none border-none bg-transparent outline-none"
 			style="font-family: inherit; font-size: inherit; font-weight: inherit; font-style: inherit; text-align: inherit; color: inherit; line-height: inherit;"
 			bind:value={editText}
 			onblur={handleInputBlur}
@@ -113,7 +111,7 @@
 		></textarea>
 	{:else}
 		<span
-			class="flex items-center justify-center w-full h-full"
+			class="flex h-full w-full items-center justify-center"
 			style="vertical-align: {element.text.verticalAlign}"
 		>
 			{displayText}

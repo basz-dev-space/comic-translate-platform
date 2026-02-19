@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type { CanvasElement } from '../types/elements';
 	import { canvasStore, selectionStore, settingsStore } from '../stores';
 	import TextElement from './TextElement.svelte';
 	import ImageElement from './ImageElement.svelte';
@@ -28,8 +27,7 @@
 	function handleWheel(e: WheelEvent) {
 		e.preventDefault();
 		const scaleBy = 1.1;
-		const newZoom =
-			e.deltaY < 0 ? canvasStore.zoom * scaleBy : canvasStore.zoom / scaleBy;
+		const newZoom = e.deltaY < 0 ? canvasStore.zoom * scaleBy : canvasStore.zoom / scaleBy;
 		canvasStore.setZoom(newZoom);
 	}
 
@@ -65,7 +63,7 @@
 <svelte:window onmousemove={handleMouseMove} onmouseup={handleMouseUp} />
 
 <div
-	class="canvas-container relative overflow-hidden bg-gray-100 border border-gray-300 rounded-lg"
+	class="canvas-container relative overflow-hidden rounded-lg border border-gray-300 bg-gray-100"
 	bind:this={container}
 	style="width: {width}px; height: {height}px;"
 	onwheel={handleWheel}
@@ -79,7 +77,7 @@
 		<img
 			src={backgroundImage || canvasStore.backgroundImage || ''}
 			alt="Background"
-			class="absolute inset-0 w-full h-full object-contain pointer-events-none"
+			class="pointer-events-none absolute inset-0 h-full w-full object-contain"
 		/>
 	{/if}
 
@@ -106,7 +104,7 @@
 
 	<!-- Grid Overlay (optional) -->
 	{#if settingsStore.settings.showGuides}
-		<div class="grid-overlay absolute inset-0 pointer-events-none opacity-20">
+		<div class="grid-overlay pointer-events-none absolute inset-0 opacity-20">
 			<!-- Grid lines would be rendered here -->
 		</div>
 	{/if}
@@ -123,7 +121,8 @@
 	}
 
 	.grid-overlay {
-		background-image: linear-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 1px),
+		background-image:
+			linear-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 1px),
 			linear-gradient(90deg, rgba(0, 0, 0, 0.1) 1px, transparent 1px);
 		background-size: 20px 20px;
 	}

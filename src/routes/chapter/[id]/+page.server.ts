@@ -1,7 +1,7 @@
 import { error, redirect } from '@sveltejs/kit';
 import { and, eq } from 'drizzle-orm';
 import { db } from '$lib/server/db';
-import { chapter, project } from '$lib/server/db/schema';
+import { chapter, project, page, textElement } from '$lib/server/db/schema';
 import { requireUser } from '$lib/server/auth';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -17,18 +17,32 @@ export const load: PageServerLoad = async (event) => {
 	const user = await requireUser(event);
 	const chapterId = parseChapterId(event.params.id);
 
-	const [selectedChapter, projects] = await Promise.all([
+	const [selectedChapter, projects, pages] = await Promise.all([
 		db.query.chapter.findFirst({
 			where: and(eq(chapter.id, chapterId), eq(chapter.userId, user.id))
 		}),
-		db.select().from(project).where(eq(project.userId, user.id))
+		db.select().from(project).where(eq(project.userId, user.id)),
+		db.select().from(page).where(eq(page.chapterId, chapterId)).orderBy(page.pageNumber)
 	]);
 
 	if (!selectedChapter) {
 		throw error(404, 'Chapter not found.');
 	}
 
-	return { chapter: selectedChapter, projects };
+	let firstPageElements: (typeof textElement.$inferSelect)[] = [];
+	if (pages.length > 0) {
+		firstPageElements = await db
+			.select()
+			.from(textElement)
+			.where(eq(textElement.pageId, pages[0].id));
+	}
+
+	return {
+		chapter: selectedChapter,
+		projects,
+		pages,
+		firstPageElements
+	};
 };
 
 export const actions: Actions = {

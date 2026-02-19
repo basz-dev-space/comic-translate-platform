@@ -1,5 +1,5 @@
 import { fail } from '@sveltejs/kit';
-import { and, desc, eq, ilike, or, sql, asc, inArray } from 'drizzle-orm';
+import { and, desc, eq, ilike, sql, asc, inArray } from 'drizzle-orm';
 import { db } from '$lib/server/db';
 import { chapter, project } from '$lib/server/db/schema';
 import { requireUser } from '$lib/server/auth';

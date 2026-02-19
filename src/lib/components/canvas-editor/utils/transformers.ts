@@ -68,11 +68,7 @@ export function rotatePoint(
 	return { x: nx, y: ny };
 }
 
-export function isPointInRotatedRect(
-	px: number,
-	py: number,
-	box: TransformBox
-): boolean {
+export function isPointInRotatedRect(px: number, py: number, box: TransformBox): boolean {
 	const cx = box.x + box.width / 2;
 	const cy = box.y + box.height / 2;
 

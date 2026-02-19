@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { canvasStore, selectionStore } from '../stores';
-	import { getBoundingBox, resizeElement } from '../utils/transformers';
+	import { getBoundingBox } from '../utils/transformers';
 
 	const selectedElements = $derived(
 		selectionStore.selectedIdsArray.map((id) => canvasStore.getElement(id)).filter(Boolean)
@@ -132,7 +132,7 @@
 
 {#if boundingBox}
 	<div
-		class="transform-controls absolute pointer-events-none"
+		class="transform-controls pointer-events-none absolute"
 		style="
 			left: {boundingBox.x}px;
 			top: {boundingBox.y}px;
@@ -141,7 +141,7 @@
 		"
 	>
 		<!-- Resize handles -->
-		{#each handlePositions as handle}
+		{#each handlePositions as handle (handle.name)}
 			<div
 				class="resize-handle pointer-events-auto"
 				style="

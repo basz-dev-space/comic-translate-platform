@@ -35,7 +35,7 @@
 </script>
 
 {#if hasTextSelection}
-	<div class="text-toolbar flex items-center gap-2 pl-2 border-l border-gray-200">
+	<div class="text-toolbar flex items-center gap-2 border-l border-gray-200 pl-2">
 		<!-- Font family -->
 		<select
 			class="font-select"
@@ -43,7 +43,7 @@
 			onchange={(e) => updateTextProperty('fontFamily', e.currentTarget.value)}
 			aria-label="Font family"
 		>
-			{#each DEFAULT_FONTS as font}
+			{#each DEFAULT_FONTS as font (font)}
 				<option value={font}>{font}</option>
 			{/each}
 		</select>
@@ -55,7 +55,7 @@
 			onchange={(e) => updateTextProperty('fontSize', parseInt(e.currentTarget.value))}
 			aria-label="Font size"
 		>
-			{#each DEFAULT_FONT_SIZES as size}
+			{#each DEFAULT_FONT_SIZES as size (size)}
 				<option value={size}>{size}</option>
 			{/each}
 		</select>
@@ -126,7 +126,7 @@
 		</label>
 
 		<!-- Alignment -->
-		<div class="flex items-center gap-1 pl-2 border-l border-gray-200">
+		<div class="flex items-center gap-1 border-l border-gray-200 pl-2">
 			<button
 				class="format-button"
 				class:active={firstElement?.text.textAlign === 'left'}
