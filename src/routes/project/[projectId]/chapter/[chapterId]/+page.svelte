@@ -10,10 +10,14 @@
 	import CardTitle from '$lib/components/ui/card/card-title.svelte';
 	import Input from '$lib/components/ui/input/input.svelte';
 	import CanvasEditor from '$lib/components/canvas-editor/CanvasEditor.svelte';
-	import PageThumbnails from '$lib/components/canvas-editor/sidebar/PageThumbnails.svelte';
 	import TranslationGrid from '$lib/components/canvas-editor/TranslationGrid.svelte';
 	import { canvasStore } from '$lib/components/canvas-editor/stores';
 	import type { TextElement } from '$lib/components/canvas-editor/types/elements';
+	import UploadIcon from '@lucide/svelte/icons/upload';
+	import ImageIcon from '@lucide/svelte/icons/image';
+	import Trash2Icon from '@lucide/svelte/icons/trash-2';
+
+	const base = '';
 
 	let { data }: { data: PageData } = $props();
 	const statuses = ['draft', 'in_progress', 'review', 'done'];
@@ -23,9 +27,12 @@
 	let gridHeight = $state(250);
 	let selectedPageId = $state<number | null>(null);
 	let currentElements = $state<TextElement[]>([]);
+	let pages = $state(data.pages);
+	let isUploading = $state(false);
+
 	$effect(() => {
-		if (data.pages.length > 0 && selectedPageId === null) {
-			selectedPageId = data.pages[0].id;
+		if (pages.length > 0 && selectedPageId === null) {
+			selectedPageId = pages[0].id;
 		}
 	});
 
@@ -66,6 +73,11 @@
 			currentElements = convertDbElementsToCanvas(data.firstPageElements);
 			canvasStore.setElements(currentElements);
 		}
+		if (pages.length > 0) {
+			const firstPage = pages[0];
+			canvasStore.setBackgroundImage(firstPage.imageUrl);
+			canvasStore.setDimensions(firstPage.width, firstPage.height);
+		}
 	});
 
 	async function loadPageElements(pageId: number) {
@@ -93,7 +105,7 @@
 
 	function handlePageSelect(pageId: number) {
 		selectedPageId = pageId;
-		const selectedPage = data.pages.find((p) => p.id === pageId);
+		const selectedPage = pages.find((p) => p.id === pageId);
 		if (selectedPage) {
 			canvasStore.setBackgroundImage(selectedPage.imageUrl);
 			canvasStore.setDimensions(selectedPage.width, selectedPage.height);
@@ -129,7 +141,93 @@
 		}
 	}
 
-	const selectedPage = $derived(data.pages.find((p) => p.id === selectedPageId));
+	async function handleFileUpload(event: Event) {
+		const input = event.target as HTMLInputElement;
+		const files = input.files;
+		if (!files || files.length === 0) return;
+
+		isUploading = true;
+
+		for (let i = 0; i < files.length; i++) {
+			const file = files[i];
+			if (!file.type.startsWith('image/')) continue;
+
+			const formData = new FormData();
+			formData.append('file', file);
+
+			try {
+				const uploadRes = await fetch(`${base}/api/upload`, {
+					method: 'POST',
+					body: formData
+				});
+
+				if (!uploadRes.ok) {
+					const img = new Image();
+					img.src = URL.createObjectURL(file);
+					await new Promise((resolve) => {
+						img.onload = resolve;
+					});
+
+					const canvas = document.createElement('canvas');
+					canvas.width = img.naturalWidth;
+					canvas.height = img.naturalHeight;
+					const ctx = canvas.getContext('2d');
+					if (ctx) {
+						ctx.drawImage(img, 0, 0);
+					}
+
+					const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+
+					const createRes = await fetch(`${base}/api/chapter/${data.chapter.id}/pages`, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({
+							imageUrl: dataUrl,
+							pageNumber: pages.length + 1,
+							width: img.naturalWidth,
+							height: img.naturalHeight
+						})
+					});
+
+					if (createRes.ok) {
+						const { page: newPage } = await createRes.json();
+						pages = [...pages, newPage];
+						if (pages.length === 1) {
+							selectedPageId = newPage.id;
+							canvasStore.setBackgroundImage(newPage.imageUrl);
+							canvasStore.setDimensions(newPage.width, newPage.height);
+						}
+					}
+				}
+			} catch (err) {
+				console.error('Upload error:', err);
+			}
+		}
+
+		isUploading = false;
+		input.value = '';
+	}
+
+	async function handleDeletePage(pageId: number) {
+		if (!confirm('Delete this page?')) return;
+
+		try {
+			const res = await fetch(`${base}/api/page/${pageId}`, {
+				method: 'DELETE'
+			});
+
+			if (res.ok) {
+				pages = pages.filter((p) => p.id !== pageId);
+				if (selectedPageId === pageId) {
+					selectedPageId = pages.length > 0 ? pages[0].id : null;
+				}
+			}
+		} catch (err) {
+			console.error('Delete error:', err);
+		}
+	}
+
+	const selectedPage = $derived(pages.find((p) => p.id === selectedPageId));
 </script>
 
 <svelte:head>
@@ -151,6 +249,20 @@
 			</h1>
 		</div>
 		<div class="flex items-center gap-2">
+			<label class="cursor-pointer">
+				<input
+					type="file"
+					accept="image/*"
+					multiple
+					class="hidden"
+					onchange={handleFileUpload}
+					disabled={isUploading}
+				/>
+				<Button variant="outline" size="sm" asChild={false} disabled={isUploading}>
+					<UploadIcon class="mr-2 h-4 w-4" />
+					{isUploading ? 'Uploading...' : 'Upload Pages'}
+				</Button>
+			</label>
 			<Button variant="outline" size="sm" onclick={() => (showEditor = !showEditor)}>
 				{showEditor ? 'Hide' : 'Show'} Editor
 			</Button>
@@ -161,64 +273,137 @@
 		<!-- Main Editor Area -->
 		<div class="flex flex-1 overflow-hidden">
 			<!-- Page Thumbnails Sidebar -->
-			<PageThumbnails
-				pages={data.pages.map((p) => ({
-					id: p.id,
-					chapterId: p.chapterId,
-					pageNumber: p.pageNumber,
-					imageUrl: p.imageUrl,
-					width: p.width,
-					height: p.height,
-					ocrStatus: p.ocrStatus
-				}))}
-				{selectedPageId}
-				onPageSelect={handlePageSelect}
-			/>
+			<aside class="flex w-48 shrink-0 flex-col border-r border-gray-200 bg-white">
+				<div class="flex items-center justify-between border-b border-gray-200 p-2">
+					<span class="text-xs font-medium text-gray-600">Pages ({pages.length})</span>
+				</div>
+				<div class="flex-1 space-y-2 overflow-y-auto p-2">
+					{#if pages.length === 0}
+						<div class="rounded-lg border-2 border-dashed p-4 text-center">
+							<ImageIcon class="mx-auto h-8 w-8 text-gray-400" />
+							<p class="mt-2 text-xs text-gray-500">No pages yet</p>
+							<label class="mt-2 inline-block cursor-pointer">
+								<input
+									type="file"
+									accept="image/*"
+									multiple
+									class="hidden"
+									onchange={handleFileUpload}
+									disabled={isUploading}
+								/>
+								<span class="text-xs text-blue-600 hover:underline">Upload images</span>
+							</label>
+						</div>
+					{:else}
+						{#each pages as page (page.id)}
+							<div
+								class="group relative w-full cursor-pointer overflow-hidden rounded-md border-2 transition-all {selectedPageId ===
+								page.id
+									? 'border-blue-500 ring-1 ring-blue-500'
+									: 'border-gray-200 hover:border-gray-400'}"
+								onclick={() => handlePageSelect(page.id)}
+								onkeydown={(e) => e.key === 'Enter' && handlePageSelect(page.id)}
+								role="button"
+								tabindex="0"
+								aria-pressed={selectedPageId === page.id}
+							>
+								<div class="relative aspect-[3/4] bg-gray-100">
+									<img
+										src={page.imageUrl}
+										alt="Page {page.pageNumber}"
+										class="h-full w-full object-cover"
+									/>
+									<span
+										class="absolute bottom-1 left-1 rounded bg-black/60 px-1 text-xs text-white"
+									>
+										{page.pageNumber}
+									</span>
+									<button
+										type="button"
+										class="absolute top-1 right-1 rounded bg-red-500 p-1 opacity-0 transition-opacity group-hover:opacity-100"
+										onclick={(e) => {
+											e.stopPropagation();
+											handleDeletePage(page.id);
+										}}
+									>
+										<Trash2Icon class="h-3 w-3 text-white" />
+									</button>
+								</div>
+							</div>
+						{/each}
+					{/if}
+				</div>
+			</aside>
 
 			<!-- Canvas + Grid Area -->
 			<div class="flex flex-1 flex-col overflow-hidden">
-				<!-- Canvas Editor -->
-				<div class="flex-1 overflow-hidden bg-gray-100">
-					<CanvasEditor
-						width={selectedPage?.width ?? 800}
-						height={selectedPage?.height ?? 600}
-						backgroundImage={selectedPage?.imageUrl}
-					/>
-				</div>
-
-				<!-- Resizer -->
-				{#if showGrid}
-					<div
-						class="h-2 cursor-row-resize bg-gray-200 transition-colors hover:bg-blue-300"
-						role="separator"
-						aria-orientation="horizontal"
-						ondragstart={handleDragStart}
-						ondrag={handleDrag}
-						draggable="true"
-					></div>
-				{/if}
-
-				<!-- Translation Grid -->
-				{#if showGrid}
-					<div class="border-t bg-white" style="height: {gridHeight}px;">
-						<div class="flex items-center justify-between border-b bg-gray-50 px-4 py-2">
-							<span class="text-sm font-medium"
-								>Translation Grid ({currentElements.length} elements)</span
-							>
-							<Button variant="ghost" size="sm" onclick={() => (showGrid = false)}>
-								↓ Collapse
-							</Button>
-						</div>
-						<div class="h-[calc(100%-40px)]">
-							<TranslationGrid elements={currentElements} onUpdate={handleElementUpdate} />
+				{#if pages.length === 0}
+					<!-- Empty State -->
+					<div class="flex flex-1 items-center justify-center bg-gray-100">
+						<div class="text-center">
+							<ImageIcon class="mx-auto h-16 w-16 text-gray-400" />
+							<h2 class="mt-4 text-lg font-semibold text-gray-900">No pages yet</h2>
+							<p class="mt-2 text-sm text-gray-500">Upload manga pages to start translating</p>
+							<label class="mt-4 inline-block cursor-pointer">
+								<input
+									type="file"
+									accept="image/*"
+									multiple
+									class="hidden"
+									onchange={handleFileUpload}
+									disabled={isUploading}
+								/>
+								<Button asChild={false} disabled={isUploading}>
+									<UploadIcon class="mr-2 h-4 w-4" />
+									{isUploading ? 'Uploading...' : 'Upload Pages'}
+								</Button>
+							</label>
 						</div>
 					</div>
 				{:else}
-					<div class="border-t bg-white p-2">
-						<Button variant="ghost" size="sm" onclick={() => (showGrid = true)}>
-							↑ Show Translation Grid
-						</Button>
+					<!-- Canvas Editor -->
+					<div class="flex-1 overflow-hidden bg-gray-100">
+						<CanvasEditor
+							width={selectedPage?.width ?? 800}
+							height={selectedPage?.height ?? 600}
+							backgroundImage={selectedPage?.imageUrl}
+						/>
 					</div>
+
+					<!-- Resizer -->
+					{#if showGrid}
+						<div
+							class="h-2 cursor-row-resize bg-gray-200 transition-colors hover:bg-blue-300"
+							role="separator"
+							aria-orientation="horizontal"
+							ondragstart={handleDragStart}
+							ondrag={handleDrag}
+							draggable="true"
+						></div>
+					{/if}
+
+					<!-- Translation Grid -->
+					{#if showGrid}
+						<div class="border-t bg-white" style="height: {gridHeight}px;">
+							<div class="flex items-center justify-between border-b bg-gray-50 px-4 py-2">
+								<span class="text-sm font-medium"
+									>Translation Grid ({currentElements.length} elements)</span
+								>
+								<Button variant="ghost" size="sm" onclick={() => (showGrid = false)}>
+									↓ Collapse
+								</Button>
+							</div>
+							<div class="h-[calc(100%-40px)]">
+								<TranslationGrid elements={currentElements} onUpdate={handleElementUpdate} />
+							</div>
+						</div>
+					{:else}
+						<div class="border-t bg-white p-2">
+							<Button variant="ghost" size="sm" onclick={() => (showGrid = true)}>
+								↑ Show Translation Grid
+							</Button>
+						</div>
+					{/if}
 				{/if}
 			</div>
 		</div>

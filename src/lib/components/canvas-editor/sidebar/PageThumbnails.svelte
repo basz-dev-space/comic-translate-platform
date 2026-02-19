@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Page } from './types';
+	import type { Page } from '../types';
 
 	interface Props {
 		pages: Page[];
