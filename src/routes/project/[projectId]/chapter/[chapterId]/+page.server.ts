@@ -5,28 +5,40 @@ import { chapter, project, page, textElement } from '$lib/server/db/schema';
 import { requireUser } from '$lib/server/auth';
 import type { Actions, PageServerLoad } from './$types';
 
-const parseChapterId = (value: string) => {
+const parseId = (value: string, name: string) => {
 	const id = Number(value);
 	if (Number.isNaN(id)) {
-		throw error(400, 'Invalid chapter id.');
+		throw error(400, `Invalid ${name}.`);
 	}
 	return id;
 };
 
 export const load: PageServerLoad = async (event) => {
 	const user = await requireUser(event);
-	const chapterId = parseChapterId(event.params.id);
+	const projectId = parseId(event.params.projectId, 'project id');
+	const chapterId = parseId(event.params.chapterId, 'chapter id');
 
-	const [selectedChapter, projects, pages] = await Promise.all([
+	const [selectedChapter, projects, pages, selectedProject] = await Promise.all([
 		db.query.chapter.findFirst({
 			where: and(eq(chapter.id, chapterId), eq(chapter.userId, user.id))
 		}),
 		db.select().from(project).where(eq(project.userId, user.id)),
-		db.select().from(page).where(eq(page.chapterId, chapterId)).orderBy(page.pageNumber)
+		db.select().from(page).where(eq(page.chapterId, chapterId)).orderBy(page.pageNumber),
+		db.query.project.findFirst({
+			where: and(eq(project.id, projectId), eq(project.userId, user.id))
+		})
 	]);
+
+	if (!selectedProject) {
+		throw error(404, 'Project not found.');
+	}
 
 	if (!selectedChapter) {
 		throw error(404, 'Chapter not found.');
+	}
+
+	if (selectedChapter.projectId !== projectId) {
+		throw error(400, 'Chapter does not belong to this project.');
 	}
 
 	let firstPageElements: (typeof textElement.$inferSelect)[] = [];
@@ -39,6 +51,7 @@ export const load: PageServerLoad = async (event) => {
 
 	return {
 		chapter: selectedChapter,
+		project: selectedProject,
 		projects,
 		pages,
 		firstPageElements
@@ -48,14 +61,14 @@ export const load: PageServerLoad = async (event) => {
 export const actions: Actions = {
 	update: async (event) => {
 		const user = await requireUser(event);
-		const chapterId = parseChapterId(event.params.id);
+		const chapterId = parseId(event.params.chapterId, 'chapter id');
 		const formData = await event.request.formData();
-		const projectId = Number(formData.get('projectId'));
+		const newProjectId = Number(formData.get('projectId'));
 		const title = String(formData.get('title') ?? '').trim();
 		const chapterNumber = Number(formData.get('chapterNumber') ?? 1);
 		const status = String(formData.get('status') ?? 'draft').trim() || 'draft';
 
-		if (!Number.isInteger(projectId) || projectId < 1) {
+		if (!Number.isInteger(newProjectId) || newProjectId < 1) {
 			throw error(400, 'Project id must be a positive integer.');
 		}
 
@@ -64,7 +77,7 @@ export const actions: Actions = {
 		}
 
 		const selectedProject = await db.query.project.findFirst({
-			where: and(eq(project.id, projectId), eq(project.userId, user.id))
+			where: and(eq(project.id, newProjectId), eq(project.userId, user.id))
 		});
 
 		if (!selectedProject) {
@@ -73,7 +86,7 @@ export const actions: Actions = {
 
 		await db
 			.update(chapter)
-			.set({ projectId, title, chapterNumber, status })
+			.set({ projectId: newProjectId, title, chapterNumber, status })
 			.where(and(eq(chapter.id, chapterId), eq(chapter.userId, user.id)));
 
 		return { success: true };
@@ -81,7 +94,8 @@ export const actions: Actions = {
 
 	delete: async (event) => {
 		const user = await requireUser(event);
-		const chapterId = parseChapterId(event.params.id);
+		const routeProjectId = parseId(event.params.projectId, 'project id');
+		const chapterId = parseId(event.params.chapterId, 'chapter id');
 
 		const existingChapter = await db.query.chapter.findFirst({
 			where: and(eq(chapter.id, chapterId), eq(chapter.userId, user.id))
@@ -91,8 +105,7 @@ export const actions: Actions = {
 			throw error(404, 'Chapter not found.');
 		}
 
-		const projectId = existingChapter.projectId;
 		await db.delete(chapter).where(and(eq(chapter.id, chapterId), eq(chapter.userId, user.id)));
-		throw redirect(303, `/project/${projectId}`);
+		throw redirect(303, `/project/${routeProjectId}`);
 	}
 };

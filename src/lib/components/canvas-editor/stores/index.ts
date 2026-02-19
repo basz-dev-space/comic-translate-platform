@@ -1,4 +1,4 @@
-export { canvasStore } from './canvasStore';
-export { selectionStore } from './selectionStore';
-export { historyStore } from './historyStore';
-export { settingsStore } from './settingsStore';
+export { canvasStore } from './canvasStore.svelte';
+export { selectionStore } from './selectionStore.svelte';
+export { historyStore } from './historyStore.svelte';
+export { settingsStore } from './settingsStore.svelte';

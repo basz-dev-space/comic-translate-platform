@@ -1,7 +1,8 @@
+import { SvelteSet } from 'svelte/reactivity';
 import type { ToolType } from '../types/tools';
 
 function createSelectionStore() {
-	let selectedIds = $state<Set<string>>(new Set());
+	let selectedIds = new SvelteSet<string>();
 	let activeTool = $state<ToolType>('select');
 
 	return {
@@ -32,37 +33,31 @@ function createSelectionStore() {
 		},
 
 		select(id: string) {
-			selectedIds = new Set([id]);
+			selectedIds = new SvelteSet([id]);
 		},
 
 		selectMultiple(ids: string[]) {
-			selectedIds = new Set(ids);
+			selectedIds = new SvelteSet(ids);
 		},
 
 		addToSelection(id: string) {
-			const newSet = new Set(selectedIds);
-			newSet.add(id);
-			selectedIds = newSet;
+			selectedIds.add(id);
 		},
 
 		removeFromSelection(id: string) {
-			const newSet = new Set(selectedIds);
-			newSet.delete(id);
-			selectedIds = newSet;
+			selectedIds.delete(id);
 		},
 
 		toggleSelection(id: string) {
-			const newSet = new Set(selectedIds);
-			if (newSet.has(id)) {
-				newSet.delete(id);
+			if (selectedIds.has(id)) {
+				selectedIds.delete(id);
 			} else {
-				newSet.add(id);
+				selectedIds.add(id);
 			}
-			selectedIds = newSet;
 		},
 
 		clearSelection() {
-			selectedIds = new Set();
+			selectedIds = new SvelteSet();
 		},
 
 		isSelected(id: string) {
@@ -70,7 +65,7 @@ function createSelectionStore() {
 		},
 
 		selectAll(ids: string[]) {
-			selectedIds = new Set(ids);
+			selectedIds = new SvelteSet(ids);
 		}
 	};
 }

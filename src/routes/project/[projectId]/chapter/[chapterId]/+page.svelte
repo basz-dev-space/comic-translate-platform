@@ -133,7 +133,7 @@
 </script>
 
 <svelte:head>
-	<title>{data.chapter.title} · Chapter · ComicTranslate</title>
+	<title>{data.chapter.title} · {data.project.name} · ComicTranslate</title>
 </svelte:head>
 
 <div class="flex h-screen flex-col">
@@ -141,10 +141,10 @@
 	<header class="flex shrink-0 items-center justify-between border-b bg-white px-4 py-2">
 		<div class="flex items-center gap-4">
 			<a
-				href={resolve(`/project/${data.chapter.projectId}`)}
+				href={resolve(`/project/${data.project.id}`)}
 				class="text-sm text-muted-foreground hover:underline"
 			>
-				← Back to Project
+				← {data.project.name}
 			</a>
 			<h1 class="text-lg font-semibold">
 				Chapter {data.chapter.chapterNumber}: {data.chapter.title}

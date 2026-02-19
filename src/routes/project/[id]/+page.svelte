@@ -75,7 +75,10 @@
 					{#each data.chapters as item (item.id)}
 						<div class="rounded-lg border p-4">
 							<div class="flex items-center justify-between gap-3">
-								<a href={resolve(`/chapter/${item.id}`)} class="font-medium hover:underline">
+								<a
+									href={resolve(`/project/${data.project.id}/chapter/${item.id}`)}
+									class="font-medium hover:underline"
+								>
 									Chapter {item.chapterNumber}: {item.title}
 								</a>
 								<form method="POST" action="?/deleteChapter">
