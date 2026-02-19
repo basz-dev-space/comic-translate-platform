@@ -21,8 +21,13 @@
 	let showEditor = $state(true);
 	let showGrid = $state(true);
 	let gridHeight = $state(250);
-	let selectedPageId = $state<number | null>(data.pages[0]?.id ?? null);
+	let selectedPageId = $state<number | null>(null);
 	let currentElements = $state<TextElement[]>([]);
+	$effect(() => {
+		if (data.pages.length > 0 && selectedPageId === null) {
+			selectedPageId = data.pages[0].id;
+		}
+	});
 
 	function convertDbElementsToCanvas(dbElements: typeof data.firstPageElements): TextElement[] {
 		return dbElements.map((el, idx) => ({

@@ -21,6 +21,18 @@
 		}
 	}
 
+	function handleKeyDown(e: KeyboardEvent) {
+		if (element.locked) return;
+		if (e.key === 'Enter' || e.key === ' ') {
+			e.preventDefault();
+			if (e.shiftKey) {
+				selectionStore.toggleSelection(element.id);
+			} else {
+				selectionStore.select(element.id);
+			}
+		}
+	}
+
 	let dragStart = $state({ x: 0, y: 0 });
 
 	function handleDragStart(e: MouseEvent) {
@@ -40,7 +52,8 @@
 	}
 </script>
 
-<div
+<button
+	type="button"
 	class="image-element absolute"
 	class:selected={isSelected}
 	class:locked={element.locked}
@@ -53,10 +66,10 @@
 		opacity: {element.opacity};
 	"
 	onclick={handleClick}
+	onkeydown={handleKeyDown}
 	onmousedown={handleDragStart}
 	onmousemove={handleDrag}
 	onmouseup={handleDragEnd}
-	role="img"
 	aria-label="Image element"
 >
 	<img
@@ -65,7 +78,7 @@
 		class="pointer-events-none h-full w-full object-cover"
 		draggable="false"
 	/>
-</div>
+</button>
 
 <style>
 	.image-element {

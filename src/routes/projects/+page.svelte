@@ -22,7 +22,11 @@
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
-	let searchInput = $state(data.search);
+	// eslint-disable-next-line svelte/prefer-writable-derived
+	let searchInput = $state('');
+	$effect(() => {
+		searchInput = data.search ?? '';
+	});
 
 	const formatDate = (value: Date | string) =>
 		new Date(value).toLocaleDateString(undefined, {
@@ -59,11 +63,6 @@
 	function clearSearch() {
 		searchInput = '';
 		window.location.href = buildUrl({ search: undefined, page: 1 });
-	}
-
-	function getSortIcon(field: string) {
-		if (data.sort !== field) return ArrowUpDownIcon;
-		return data.dir === 'asc' ? ArrowUpIcon : ArrowDownIcon;
 	}
 </script>
 
@@ -173,7 +172,13 @@
 									class="rounded p-1 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
 									title="Sort by name"
 								>
-									<svelte:component this={getSortIcon('name')} class="h-4 w-4" />
+									{#if data.sort !== 'name'}
+										<ArrowUpDownIcon class="h-4 w-4" />
+									{:else if data.dir === 'asc'}
+										<ArrowUpIcon class="h-4 w-4" />
+									{:else}
+										<ArrowDownIcon class="h-4 w-4" />
+									{/if}
 								</button>
 								<form method="POST" action="?/delete">
 									<input type="hidden" name="id" value={item.id} />

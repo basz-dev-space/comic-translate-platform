@@ -43,9 +43,17 @@
 	function handleKeyDown(e: KeyboardEvent) {
 		if (e.key === 'Escape') {
 			isEditing = false;
-		} else if (e.key === 'Enter' && !e.shiftKey) {
+		} else if (e.key === 'Enter' && !e.shiftKey && isEditing) {
 			e.preventDefault();
 			handleInputBlur();
+		} else if ((e.key === 'Enter' || e.key === ' ') && !isEditing) {
+			if (element.locked) return;
+			e.preventDefault();
+			if (e.shiftKey) {
+				selectionStore.toggleSelection(element.id);
+			} else {
+				selectionStore.select(element.id);
+			}
 		}
 	}
 
@@ -92,6 +100,7 @@
 		line-height: {element.text.lineHeight};
 	"
 	onclick={handleClick}
+	onkeydown={handleKeyDown}
 	ondblclick={handleDoubleClick}
 	onmousedown={handleDragStart}
 	onmousemove={handleDrag}

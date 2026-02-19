@@ -23,8 +23,14 @@
 
 	let { data, form }: { data: PageData; form: ActionData } = $props();
 
-	let searchInput = $state(data.search);
+	// eslint-disable-next-line svelte/prefer-writable-derived
+	let searchInput = $state('');
 	let showFilters = $state(false);
+	$effect(() => {
+		searchInput = data.search ?? '';
+	});
+
+	let hasActiveFilters = $derived(data.search || data.statuses.length > 0 || data.projectId);
 
 	const statusOptions = [
 		{ value: 'draft', label: 'Draft', color: 'bg-secondary text-secondary-foreground' },
@@ -91,13 +97,6 @@
 			page: 1
 		});
 	}
-
-	function getSortIcon(field: string) {
-		if (data.sort !== field) return ArrowUpDownIcon;
-		return data.dir === 'asc' ? ArrowUpIcon : ArrowDownIcon;
-	}
-
-	const hasActiveFilters = data.search || data.statuses.length > 0 || data.projectId;
 </script>
 
 <svelte:head>
@@ -206,8 +205,11 @@
 				{#if showFilters}
 					<div class="grid gap-4 rounded-lg border p-4 md:grid-cols-2">
 						<div>
-							<label class="mb-2 block text-sm font-medium">Filter by Project</label>
+							<label for="project-filter" class="mb-2 block text-sm font-medium"
+								>Filter by Project</label
+							>
 							<select
+								id="project-filter"
 								class="w-full rounded-md border bg-background px-3 py-2 text-sm"
 								value={data.projectId || ''}
 								onchange={(e) => {
@@ -222,7 +224,7 @@
 							</select>
 						</div>
 						<div>
-							<label class="mb-2 block text-sm font-medium">Filter by Status</label>
+							<span class="mb-2 block text-sm font-medium">Filter by Status</span>
 							<div class="flex flex-wrap gap-2">
 								{#each statusOptions as option (option.value)}
 									<button
@@ -290,7 +292,13 @@
 									class="rounded p-1 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
 									title="Sort by status"
 								>
-									<svelte:component this={getSortIcon('status')} class="h-4 w-4" />
+									{#if data.sort !== 'status'}
+										<ArrowUpDownIcon class="h-4 w-4" />
+									{:else if data.dir === 'asc'}
+										<ArrowUpIcon class="h-4 w-4" />
+									{:else}
+										<ArrowDownIcon class="h-4 w-4" />
+									{/if}
 								</button>
 								<form method="POST" action="?/delete">
 									<input type="hidden" name="id" value={item.id} />
