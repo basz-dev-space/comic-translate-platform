@@ -13,7 +13,8 @@ type SortField = (typeof VALID_SORT_FIELDS)[number];
 type SortDirection = (typeof VALID_SORT_DIRECTIONS)[number];
 
 function parseSearchParams(url: URL) {
-	const page = Math.max(1, parseInt(url.searchParams.get('page') || '1', 10));
+	const parsedPage = parseInt(url.searchParams.get('page') || '1', 10);
+	const page = Number.isNaN(parsedPage) ? 1 : Math.max(1, parsedPage);
 	const search = url.searchParams.get('search')?.trim() || '';
 	const sortField = url.searchParams.get('sort') as SortField | null;
 	const sortDirection = url.searchParams.get('dir') as SortDirection | null;

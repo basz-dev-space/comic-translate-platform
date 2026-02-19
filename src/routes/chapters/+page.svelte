@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { ActionData, PageData } from './$types';
+	import { base } from '$app/paths';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Card from '$lib/components/ui/card/card.svelte';
 	import CardContent from '$lib/components/ui/card/card-content.svelte';
@@ -124,9 +125,8 @@
 				<div class="rounded-lg border-2 border-dashed p-6 text-center">
 					<FolderKanbanIcon class="mx-auto h-8 w-8 text-muted-foreground" />
 					<p class="mt-2 text-sm text-muted-foreground">
-						<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-						<a href="/projects" class="text-primary hover:underline">Create a project first</a> to add
-						chapters.
+						<a href="{base}/projects" class="text-primary hover:underline">Create a project first</a
+						> to add chapters.
 					</p>
 				</div>
 			{:else}
@@ -209,8 +209,10 @@
 							<select
 								class="w-full rounded-md border bg-background px-3 py-2 text-sm"
 								value={data.projectId || ''}
-								onchange={(e) =>
-									handleProjectFilter(e.target.value ? parseInt(e.target.value) : null)}
+								onchange={(e) => {
+									const target = e.target as HTMLSelectElement;
+									handleProjectFilter(target.value ? parseInt(target.value) : null);
+								}}
 							>
 								<option value="">All projects</option>
 								{#each data.projects as projectItem (projectItem.id)}
@@ -265,8 +267,7 @@
 					<CardContent class="p-4">
 						<div class="flex items-center justify-between gap-3">
 							<div class="flex-1">
-								<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-								<a href="/chapter/{item.id}" class="group/title">
+								<a href="{base}/chapter/{item.id}" class="group/title">
 									<h3 class="font-display text-lg group-hover/title:text-manga-accent">
 										Chapter {item.chapterNumber}: {item.title}
 									</h3>

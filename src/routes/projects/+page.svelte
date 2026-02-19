@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { ActionData, PageData } from './$types';
+	import { base } from '$app/paths';
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Card from '$lib/components/ui/card/card.svelte';
 	import CardContent from '$lib/components/ui/card/card-content.svelte';
@@ -152,8 +153,7 @@
 					<CardContent class="p-4">
 						<div class="flex items-center justify-between gap-3">
 							<div class="flex-1">
-								<!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
-								<a href="/project/{item.id}" class="block">
+								<a href="{base}/project/{item.id}" class="block">
 									<h3 class="font-display text-lg hover:text-manga-accent">{item.name}</h3>
 								</a>
 								<p class="mt-1 line-clamp-1 text-sm text-muted-foreground">
